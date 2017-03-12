@@ -1,11 +1,12 @@
 {
   "name": "ways2go",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Social networking rideshare solution for your daily commute.",
-  "main": "gulpfile.js",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "test": "DEBUG='ways2go*' ./node_modules/mocha/bin/mocha",
+    "coveralls": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
+    "start": "DEBUG='ways2go*' node server.js"
   },
   "repository": {
     "type": "git",
