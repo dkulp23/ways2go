@@ -1,0 +1,44 @@
+{
+  "name": "ways2go",
+  "version": "0.0.1",
+  "description": "Social networking rideshare solution for your daily commute.",
+  "main": "server.js",
+  "scripts": {
+    "test": "DEBUG='ways2go*' ./node_modules/mocha/bin/mocha",
+    "lint": "gulp lint",
+    "coveralls": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
+    "start": "DEBUG='ways2go*' node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dkulp23/ways2go.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dkulp23/ways2go/issues"
+  },
+  "homepage": "https://github.com/dkulp23/ways2go#readme",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "coveralls": "^2.12.0",
+    "gulp": "^3.9.1",
+    "gulp-eslint": "^3.0.1",
+    "istanbul": "^0.4.5",
+    "mocha": "^3.2.0",
+    "superagent": "^3.5.0"
+  },
+  "dependencies": {
+    "bcrypt": "^1.0.2",
+    "bluebird": "^3.5.0",
+    "body-parser": "^1.17.1",
+    "cors": "^2.8.1",
+    "debug": "^2.6.2",
+    "express": "^4.15.2",
+    "http-errors": "^1.6.1",
+    "jsonwebtoken": "^7.3.0",
+    "mongoose": "^4.8.7",
+    "morgan": "^1.8.1"
+  }
+}
