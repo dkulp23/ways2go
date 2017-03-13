@@ -14,7 +14,8 @@ const locationSchema = Schema({
   type: { type: String },
   city: { type: String },
   state: { type: String },
-  zip: { type: String, required: true }
+  zip: { type: String, required: true },
+  timestamp: { type: Date, default: Date.now }
 });
 
 module.exports = mongoose.model('location', locationSchema);
