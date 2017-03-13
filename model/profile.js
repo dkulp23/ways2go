@@ -6,7 +6,6 @@ const Schema = mongoose.Schema;
 const profileSchema = Schema({
   userID: { type: Schema.Types.ObjectId, required: true },
   displayName: { type: String, required: true, unique: true },
-  trips: [{ type: Schema.Types.ObjectId }],
   fullName: { type: String },
   address: { type: String },
   bio: { type: String },
