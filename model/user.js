@@ -7,14 +7,15 @@ const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const jwt = require('jwt');
 const Promise = require('bluebird');
+require('mongoose-type-email');
 
 const Schema = mongoose.Schema;
 
 const userSchema = Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  created: { type: Date, default: Date.now }, 
+  email: { type: mongoose.SchemaTypes.Email, required: true, unique: true },
+  timeStamp: { type: Date, default: Date.now },
   findHash: { type: String, unique: true }
 });
 
