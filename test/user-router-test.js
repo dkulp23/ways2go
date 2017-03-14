@@ -38,6 +38,34 @@ describe('User Routes', function() {
         });
       });
     });
+
+    describe('without a request body', () => {
+      it('should return a 400 error', done => {
+        request.post(`${url}/api/user`)
+        .end((err, res) => {
+          console.log('res', res.text);
+          expect(err.status).to.equal(400);
+          expect(res.status).to.equal(err.status);
+          done();
+        });
+      });
+    });
+
+    describe('with an invalid email', () => {
+      it('should return a 400 error', done => {
+        request.post(`${url}/api/user`)
+        .send({
+          username: 'test',
+          password: 'checkit',
+          email: 'notanemail'
+        })
+        .end((err, res) => {
+          expect(err.status).to.equal(400);
+          expect(res.status).to.equal(err.status);
+          done();
+        });
+      });
+    });
   });
 
   describe('GET: /api/user', function() {
