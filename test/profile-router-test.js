@@ -26,3 +26,93 @@ const testProfile = {
   address: '2901 3rd Ave, Seattle, WA 98121',
   bio: 'Can\'t wait to meet my new best friend on ways2go!'
 };
+
+describe('Profile Routes', function() {
+  afterEach( done => {
+    Promise.all([
+      User.remove({}),
+      Profile.remove({})
+    ])
+    .then( () => done())
+    .catch(done);
+  });
+
+  describe('POST: /api/profile', function() {
+    beforeEach( done => {
+      new User(testUser)
+      .generatePasswordHash(testUser.password)
+      .then( user => user.save())
+      .then( user => {
+        this.tempUser = user;
+        return user.generateToken();
+      })
+      .then( token => {
+        this.tempToken = token;
+        done();
+      })
+      .catch(done);
+    });
+
+    describe('with a valid request', () => {
+      it('should return a profile', done => {
+        request.post(`${url}/api/profile`)
+        .send(testProfile)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`
+        })
+        .end((err, res) => {
+          if (err) return done(err);
+          expect(res.status).to.equal(200);
+          expect(res.body.displayName).to.equal(testProfile.displayName);
+          expect(res.body.userID).to.equal(this.tempUser._id.toString());
+          done();
+        });
+      });
+    });
+  });
+
+  describe('GET: /api/gallery', function() {
+    beforeEach( done => {
+      new User(testUser)
+      .generatePasswordHash(testUser.password)
+      .then( user => user.save())
+      .then( user => {
+        this.tempUser = user;
+        return user.generateToken();
+      })
+      .then( token => {
+        this.tempToken = token;
+        done();
+      })
+      .catch(done);
+    });
+
+    beforeEach( done => {
+      testProfile.userID = this.tempUser._id.toString();
+      new Profile(testProfile).save()
+      .then( profile => {
+        this.tempProfile = profile;
+        done();
+      })
+      .catch(done);
+    });
+
+    afterEach( () => {
+      delete testProfile.userID;
+    });
+
+    describe('with a valid request', () => {
+      it('should return a profile', done => {
+        request.get(`${url}/api/profile/`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`
+        })
+        .end((err, res) => {
+          if (err) return done(err);
+          expect(res.status).to.equal(200);
+          done();
+        });
+      });
+    });
+  });
+});
