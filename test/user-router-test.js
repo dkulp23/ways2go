@@ -13,9 +13,9 @@ require('../server.js');
 const url = `http://localhost:${process.env.PORT}`;
 
 const testUser = {
-  username: 'sample name',
+  username: 'tester name',
   password: 'password',
-  email: 'sample@email.com',
+  email: 'test@email.com',
 };
 
 describe('User Routes', function() {
@@ -30,6 +30,32 @@ describe('User Routes', function() {
       it('should return a token', done => {
         request.post(`${url}/api/user`)
         .send(testUser)
+        .end((err, res) => {
+          if (err) return done(err);
+          expect(res.status).to.equal(200);
+          expect(res.text).to.be.a('string');
+          done();
+        });
+      });
+    });
+  });
+
+  describe('GET: /api/user', function() {
+    before( done => {
+      let user = new User(testUser);
+      user.generatePasswordHash(user.password)
+      .then( user => user.save())
+      .then( user => {
+        this.tempUser = user;
+        done();
+      })
+      .catch(done);
+    });
+
+    describe('with valid request', () => {
+      it('should return a token', done => {
+        request.get(`${url}/api/user`)
+        .auth('tester name', 'password')
         .end((err, res) => {
           if (err) return done(err);
           expect(res.status).to.equal(200);
