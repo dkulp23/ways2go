@@ -8,6 +8,7 @@ const Promise = require('bluebird');
 const User = require('../model/user.js');
 const Profile = require('../model/profile.js');
 const Way = require('../model/way.js');
+const Location = require('../model/location.js');
 
 mongoose.Promise = Promise;
 
@@ -62,7 +63,7 @@ describe('Way Routes', function() {
   });
 
   afterEach( done => {
-    Promise.all([ User.remove({}), Profile.remove({}), Way.remove({}) ])
+    Promise.all([ User.remove({}), Profile.remove({}), Way.remove({}), Location.remove({}) ])
     .then( () => done())
     .catch(done);
   });
@@ -73,7 +74,7 @@ describe('Way Routes', function() {
   });
 
   describe('POST: /api/way', () => {
-    describe('with a valid body', () => {
+    describe('with a valid request body', () => {
       it('should return a way', done => {
         request.post(`${url}/api/way`)
         .send(testWay)
@@ -103,6 +104,24 @@ describe('Way Routes', function() {
             done();
           })
           .catch(done);
+        });
+      });
+    });
+
+    describe('with an invalid request body: no start location provided', () => {
+      let invalidWayNoStartLocation = {
+        endLocation: '123 fake st seattle'
+      };
+      it('should respond with a 400 code', done => {
+        request.post(`${url}/api/way`)
+        .send(invalidWayNoStartLocation)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`,
+        })
+        .end((err, res) => {
+          expect(err).to.be.an('error');
+          expect(res.status).to.equal(400);
+          done();
         });
       });
     });
