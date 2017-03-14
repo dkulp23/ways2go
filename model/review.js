@@ -8,6 +8,7 @@ const reviewSchema = Schema({
   comment: { type: String, required: false },
   timestamp: { type: Date, required: true, default: Date.now },
   userID: { type: Schema.Types.ObjectId, required: true },
+  wayID: { type: Schema.Types.ObjectId, required: true},
   reviewedUserID: { type: Schema.Types.ObjectId, required: true }
 });
 
