@@ -51,4 +51,8 @@ wayRouter.post('/api/way', bearerAuth, jsonParser, function(req, res, next) {
   });
 });
 
-// wayRouter.get('/api/way/:id', bearerAuth, function(req, res, next));
+wayRouter.get('/api/way/:id', bearerAuth, function(req, res, next) {
+  Way.findById(req.params.id)
+  .then( way => res.json(way))
+  .catch(next);
+});

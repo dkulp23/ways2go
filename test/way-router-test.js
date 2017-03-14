@@ -4,6 +4,7 @@ const expect = require('chai').expect;
 const request = require('superagent');
 const mongoose = require('mongoose');
 const Promise = require('bluebird');
+const parseLocation = require('parse-address').parseLocation;
 
 const User = require('../model/user.js');
 const Profile = require('../model/profile.js');
@@ -29,6 +30,9 @@ const testProfile = {
   bio: 'test bio',
   avgRating: 3,
 };
+
+const testLocation1 = '777 Seven st 77777';
+const testLocation2 = '11 eleven ave virginia beach,va 11111';
 
 const testWay = {
   startLocation: '1234 1st ave 98765',
@@ -121,6 +125,54 @@ describe('Way Routes', function() {
         .end((err, res) => {
           expect(err).to.be.an('error');
           expect(res.status).to.equal(400);
+          done();
+        });
+      });
+    });
+  });
+
+  describe('GET: /api/way/:id', () => {
+    beforeEach( done => {
+      let promLoc1 = new Location(parseLocation(testLocation1)).save()
+      .then( location1 => {
+        this.tempLocation1 = location1;
+      })
+      .catch(done);
+
+      let promLoc2 = new Location(parseLocation(testLocation2)).save()
+      .then( location1 => {
+        this.tempLocation1 = location1;
+      })
+      .catch(done);
+
+      Promise.all([ promLoc1, promLoc2 ])
+      .then( () => done())
+      .catch(done);
+    });
+
+    beforeEach( done => {
+      let tempWayObj = {
+        profileID: this.tempProfile._id,
+        startLocationID: this.tempLocation1._id,
+        endLocationID: this.tempLocation1._id
+      };
+      new Way(tempWayObj).save()
+      .then( way => {
+        this.tempWay = way;
+        done();
+      })
+      .catch(done);
+    });
+
+    describe('with a valid id provided', () => {
+      it('should return a way', done => {
+        request.get(`${url}/api/way/${this.tempWay._id}`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`,
+        })
+        .end((err, res) => {
+          if (err) done(err);
+          expect(res.status).to.equal(200);
           done();
         });
       });
