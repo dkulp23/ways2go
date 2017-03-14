@@ -8,11 +8,14 @@ const Schema = mongoose.Schema;
 mongoose.Promise = Promise;
 
 const waySchema = Schema({
-  startLocation: { type: Schema.Types.ObjectId, required: true },
-  endLocation: { type: Schema.Types.ObjectId, required: true },
-  profileID: { type: Schema.Types.ObjectId, required: true },
-  groupMembers: [{ type: Schema.Types.ObjectId, required: true }],
-  timestamp: { type: Date, default: Date.now }
+  startLocation: { type: Schema.Types.ObjectId, required: true }, //req
+  endLocation: { type: Schema.Types.ObjectId, required: true },   //req
+  profileID: { type: Schema.Types.ObjectId, required: true },     //req.user
+  groupMembers: [{ type: Schema.Types.ObjectId }],                //put
+  timestamp: { type: Date, default: Date.now }                    //on instance
+
+  //recurring
+  //date/time
 });
 
 module.exports = mongoose.model('way', waySchema);
