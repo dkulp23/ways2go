@@ -19,3 +19,17 @@ profileRouter.post('/api/profile', bearerAuth, jsonParser, function(req, res, ne
   .then( profile => res.json(profile))
   .catch(next);
 });
+
+profileRouter.get('/api/profile/', bearerAuth, function(req, res, next) {
+  debug('GET: /api/profile');
+
+  Profile.findOne({ userID: req.user._id})
+  .then( profile => {
+    if (!profile) return next(createError(404, 'Profile Not Found'));
+    if (profile.userID.toString() !== req.user._id.toString()) {
+      return next(createError(401, 'Unauthorized User'));
+    }
+    res.json(profile);
+  })
+  .catch(next);
+});
