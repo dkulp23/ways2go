@@ -98,4 +98,35 @@ describe('User Routes', function() {
       });
     });
   });
+
+  describe('DELETE: /api/user', function() {
+    before( done => {
+      let user = new User(testUser);
+      user.generatePasswordHash(testUser.password)
+      .then( user => user.save())
+      .then( user => {
+        this.tempUser = user;
+        return user.generateToken();
+      })
+      .then( token => {
+        this.tempToken = token;
+        done();
+      })
+      .catch(done);
+    });
+
+    describe('with a valid request', () => {
+      it('should return a 204 status code', done => {
+        request.delete(`${url}/api/user/${this.tempUser._id}`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`
+        })
+        .end((err, res) => {
+          if (err) return done(err);
+          expect(res.status).to.equal(204);
+          done();
+        });
+      });
+    });
+  });
 });

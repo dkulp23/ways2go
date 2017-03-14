@@ -53,3 +53,21 @@ userRouter.put('/api/user/:id', bearerAuth, jsonParser, function(req, res, next)
   .then( user => res.json(user))
   .catch(next);
 });
+
+userRouter.delete('/api/user/:id', bearerAuth, function(req, res, next) {
+  debug('DELETE: /api/user');
+
+  User.findById(req.params.id)
+  .then( user => {
+    if (!user) return next(createError(404, 'user not found'));
+    if (user._id.toString() !== req.params.id.toString()) {
+      return next(createError(401, 'Unauthorized User'));
+    }
+    return User.findByIdAndRemove(req.params.id);
+  })
+  .then( removed => {
+    if (!removed) return next(createError(404, 'user not found'));
+    return next(res.status(204).send('account removed'));
+  })
+  .catch(next);
+});
