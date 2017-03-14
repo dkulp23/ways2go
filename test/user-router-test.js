@@ -234,7 +234,7 @@ describe('User Routes', function() {
   });
 
   describe('DELETE: /api/user', function() {
-    before( done => {
+    beforeEach( done => {
       let user = new User(testUser);
       user.generatePasswordHash(testUser.password)
       .then( user => user.save())
@@ -258,6 +258,17 @@ describe('User Routes', function() {
         .end((err, res) => {
           if (err) return done(err);
           expect(res.status).to.equal(204);
+          done();
+        });
+      });
+    });
+
+    describe('without a token', () => {
+      it('should return a 401 error', done => {
+        request.delete(`${url}/api/user`)
+        .end((err, res) => {
+          expect(err.status).to.equal(401);
+          expect(res.text).to.equal('UnauthorizedError');
           done();
         });
       });
