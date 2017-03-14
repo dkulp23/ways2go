@@ -1,6 +1,6 @@
 'use strict';
 
-const debug = require('ways2go:way'); //eslint-disable-line
+const debug = require('debug')('ways2go:way'); //eslint-disable-line
 
 const Promise = require('bluebird');
 const mongoose = require('mongoose');
