@@ -158,7 +158,7 @@ describe('User Routes', function() {
   });
 
   describe('PUT: /api/user', function() {
-    before( done => {
+    beforeEach( done => {
       let user = new User(testUser);
       user.generatePasswordHash(user.password)
       .then( user => user.save())
@@ -184,6 +184,49 @@ describe('User Routes', function() {
           if (err) return done(err);
           expect(res.status).to.equal(200);
           expect(res.body.email).to.equal('new@email.com');
+          done();
+        });
+      });
+    });
+
+    describe('without a request body', () => {
+      it('should return a 400 error', done => {
+        request.put(`${url}/api/user`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`
+        })
+        .end((err, res) => {
+          expect(err.status).to.equal(400);
+          expect(err.message).to.equal('Bad Request');
+          expect(res.text).to.equal('BadRequestError');
+          done();
+        });
+      });
+    });
+
+    describe('without a token', () => {
+      it('should return a 401 error', done => {
+        request.put(`${url}/api/user`)
+        .send({ email: 'new@email.com'})
+        .end((err, res) => {
+          expect(err.status).to.equal(401);
+          expect(err.message).to.equal('Unauthorized');
+          expect(res.text).to.equal('UnauthorizedError');
+          done();
+        });
+      });
+    });
+
+    describe('with an invalid request', () => {
+      it('should return a 400 error', done => {
+        request.put(`${url}/api/user`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`
+        })
+        .send({ favColor: 'blue' })
+        .end((err, res) => {
+          expect(err.status).to.equal(400);
+          console.log('res', res.text);
           done();
         });
       });
