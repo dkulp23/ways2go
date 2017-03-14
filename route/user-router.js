@@ -4,6 +4,7 @@ const debug = require('debug')('ways2go:user-router');
 const jsonParser = require('body-parser').json();
 const Router = require('express').Router;
 const basicAuth = require('../lib/basic-auth-middleware.js');
+const bearerAuth = require('../lib/bearer-auth-middleware.js');
 const createError = require('http-errors');
 
 const User = require('../model/user.js');
@@ -30,10 +31,25 @@ userRouter.get('/api/user', basicAuth, function(req, res, next) {
 
   User.findOne({ username: req.auth.username })
   .then( user => {
-    if (!user) return next(createError(401, 'username not found'));
+    if (!user) return next(createError(404, 'user not found'));
     return user.comparePasswordHash(req.auth.password);
   })
   .then( user => user.generateToken())
   .then( token => res.send(token))
+  .catch(next);
+});
+
+userRouter.put('/api/user/:id', bearerAuth, jsonParser, function(req, res, next) {
+  debug('PUT /api/user');
+
+  User.findById(req.params.id)
+  .then( user => {
+    if (!user) return next(createError(404, 'user not found'));
+    if (user._id.toString() !== req.params.id.toString()) {
+      return next(createError(401, 'Unauthorized User'));
+    }
+    return User.findByIdAndUpdate(req.params.id, req.body, { new: true });
+  })
+  .then( user => res.json(user))
   .catch(next);
 });
