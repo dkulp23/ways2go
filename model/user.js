@@ -5,7 +5,7 @@ const createError = require('http-errors');
 const debug = require('debug')('ways2go:user-model');
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
-const jwt = require('jwt');
+const jwt = require('jsonwebtoken');
 const Promise = require('bluebird');
 require('mongoose-type-email');
 
