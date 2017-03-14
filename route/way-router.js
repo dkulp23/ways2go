@@ -52,7 +52,17 @@ wayRouter.post('/api/way', bearerAuth, jsonParser, function(req, res, next) {
 });
 
 wayRouter.get('/api/way/:id', bearerAuth, function(req, res, next) {
+  debug('GET: /api/way/:id');
+
   Way.findById(req.params.id)
+  .then( way => res.json(way))
+  .catch(next);
+});
+
+wayRouter.put('/api/way/:id', bearerAuth, jsonParser, function(req, res, next) {
+  debug('PUT: /api/way/:id');
+
+  Way.findByIdAndUpdate(req.params.id, req.body, { new: true })
   .then( way => res.json(way))
   .catch(next);
 });

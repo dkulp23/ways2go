@@ -14,6 +14,8 @@ const waySchema = Schema({
   wayerz: [{ type: Schema.Types.ObjectId , ref:'profile'}],
   timestamp: { type: Date, default: Date.now },
   recurringDayOfWeek: [{ type: Number }],
+  startTime: { type: Number },
+  oneTimeDate: { type: Date }
 });
 
 module.exports = mongoose.model('way', waySchema);

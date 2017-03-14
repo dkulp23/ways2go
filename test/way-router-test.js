@@ -66,6 +66,38 @@ describe('Way Routes', function() {
     .catch(done);
   });
 
+  beforeEach( done => {
+    let promLoc1 = new Location(parseLocation(testLocation1)).save()
+    .then( location1 => {
+      this.tempLocation1 = location1;
+    })
+    .catch(done);
+
+    let promLoc2 = new Location(parseLocation(testLocation2)).save()
+    .then( location1 => {
+      this.tempLocation1 = location1;
+    })
+    .catch(done);
+
+    Promise.all([ promLoc1, promLoc2 ])
+    .then( () => done())
+    .catch(done);
+  });
+
+  beforeEach( done => {
+    let tempWayObj = {
+      profileID: this.tempProfile._id,
+      startLocationID: this.tempLocation1._id,
+      endLocationID: this.tempLocation1._id
+    };
+    new Way(tempWayObj).save()
+    .then( way => {
+      this.tempWay = way;
+      done();
+    })
+    .catch(done);
+  });
+
   afterEach( done => {
     Promise.all([ User.remove({}), Profile.remove({}), Way.remove({}), Location.remove({}) ])
     .then( () => done())
@@ -132,41 +164,30 @@ describe('Way Routes', function() {
   });
 
   describe('GET: /api/way/:id', () => {
-    beforeEach( done => {
-      let promLoc1 = new Location(parseLocation(testLocation1)).save()
-      .then( location1 => {
-        this.tempLocation1 = location1;
-      })
-      .catch(done);
-
-      let promLoc2 = new Location(parseLocation(testLocation2)).save()
-      .then( location1 => {
-        this.tempLocation1 = location1;
-      })
-      .catch(done);
-
-      Promise.all([ promLoc1, promLoc2 ])
-      .then( () => done())
-      .catch(done);
-    });
-
-    beforeEach( done => {
-      let tempWayObj = {
-        profileID: this.tempProfile._id,
-        startLocationID: this.tempLocation1._id,
-        endLocationID: this.tempLocation1._id
-      };
-      new Way(tempWayObj).save()
-      .then( way => {
-        this.tempWay = way;
-        done();
-      })
-      .catch(done);
-    });
-
     describe('with a valid id provided', () => {
       it('should return a way', done => {
         request.get(`${url}/api/way/${this.tempWay._id}`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`,
+        })
+        .end((err, res) => {
+          if (err) done(err);
+          expect(res.status).to.equal(200);
+          done();
+        });
+      });
+    });
+  });
+
+  describe('PUT: /api/way/:id', () => {
+    let updateWay = {
+      startTime: 9 * 60 + 45, //minutes
+      recurringDayOfWeek: [0,1,2,3,4]
+    };
+    describe('with a valid id and request body', () => {
+      it('should return an updated way', done => {
+        request.put(`${url}/api/way/${this.tempWay._id}`)
+        .send(updateWay)
         .set({
           Authorization: `Bearer ${this.tempToken}`,
         })
