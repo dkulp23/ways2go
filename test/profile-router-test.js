@@ -103,13 +103,62 @@ describe('Profile Routes', function() {
 
     describe('with a valid request', () => {
       it('should return a profile', done => {
-        request.get(`${url}/api/profile/`)
+        request.get(`${url}/api/profile/${this.tempProfile._id}`)
         .set({
           Authorization: `Bearer ${this.tempToken}`
         })
         .end((err, res) => {
           if (err) return done(err);
           expect(res.status).to.equal(200);
+          done();
+        });
+      });
+    });
+  });
+
+  describe('PUT: /api/profile', function() {
+    beforeEach( done => {
+      let user = new User(testUser);
+      user.generatePasswordHash(testUser.password)
+      .then( user => user.save())
+      .then( user => {
+        this.tempUser = user;
+        return user.generateToken();
+      })
+      .then( token => {
+        this.tempToken = token;
+        done();
+      })
+      .catch(done);
+    });
+
+    beforeEach( done => {
+      testProfile.userID = this.tempUser._id.toString();
+      new Profile(testProfile).save()
+      .then( profile => {
+        this.tempProfile = profile;
+        done();
+      })
+      .catch(done);
+    });
+
+    afterEach( () => {
+      delete testProfile.userID;
+    });
+
+    describe('with a valid request', () => {
+      it('should return an updated profile', done => {
+        request.put(`${url}/api/profile`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`
+        })
+        .send({
+          displayName: 'cooldisplayname'
+        })
+        .end((err, res) => {
+          if (err) return done(err);
+          expect(res.status).to.equal(200);
+          expect(res.body.displayName).to.equal('cooldisplayname');
           done();
         });
       });

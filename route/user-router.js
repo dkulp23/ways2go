@@ -50,7 +50,11 @@ userRouter.put('/api/user/:id', bearerAuth, jsonParser, function(req, res, next)
     }
     return User.findByIdAndUpdate(req.params.id, req.body, { new: true });
   })
-  .then( user => res.json(user))
+  .then( user => {
+    let reqKeys = Object.keys(req.body);
+    if (!user[reqKeys]) return next(createError(400, 'bad request'));
+    res.json(user);
+  })
   .catch(next);
 });
 
