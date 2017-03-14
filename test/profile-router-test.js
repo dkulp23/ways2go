@@ -164,4 +164,49 @@ describe('Profile Routes', function() {
       });
     });
   });
+
+  describe('DELETE: /api/profile', function() {
+    beforeEach( done => {
+      let user = new User(testUser);
+      user.generatePasswordHash(testUser.password)
+      .then( user => user.save())
+      .then( user => {
+        this.tempUser = user;
+        return user.generateToken();
+      })
+      .then( token => {
+        this.tempToken = token;
+        done();
+      })
+      .catch(done);
+    });
+
+    beforeEach( done => {
+      testProfile.userID = this.tempUser._id.toString();
+      new Profile(testProfile).save()
+      .then( profile => {
+        this.tempProfile = profile;
+        done();
+      })
+      .catch(done);
+    });
+
+    afterEach( () => {
+      delete testProfile.userID;
+    });
+
+    describe('with a valid request', () => {
+      it('should return a 204 status', done => {
+        request.delete(`${url}/api/profile`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`
+        })
+        .end((err, res) => {
+          if (err) return done(err);
+          expect(res.status).to.equal(204);
+          done();
+        });
+      });
+    });
+  });
 });

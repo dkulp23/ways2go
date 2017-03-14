@@ -49,3 +49,21 @@ profileRouter.put('/api/profile', bearerAuth, jsonParser, function(req, res, nex
   })
   .catch(next);
 });
+
+profileRouter.delete('/api/profile', bearerAuth, function(req, res, next) {
+  debug('DELETE: /api/profile');
+
+  Profile.findOne({ userID: req.user._id })
+  .then( profile => {
+    if (!profile) return next(createError(404, 'profile not found'));
+    if (profile.userID.toString() !== req.user._id.toString()) {
+      return next(createError(401, 'unauthorized user'));
+    }
+    return Profile.findByIdAndRemove(profile._id);
+  })
+  .then( deleted => {
+    if (!deleted) return next(createError(404, 'profile not found'));
+    return next(res.status(204).send('profile deleted'));
+  })
+  .catch(next);
+});
