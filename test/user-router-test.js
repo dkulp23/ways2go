@@ -84,7 +84,7 @@ describe('User Routes', function() {
 
     describe('with a valid request', () => {
       it('should return an updated user', done => {
-        request.put(`${url}/api/user/${this.tempUser._id}`)
+        request.put(`${url}/api/user`)
         .send({ email: 'new@email.com' })
         .set({
           Authorization: `Bearer ${this.tempToken}`
@@ -117,7 +117,7 @@ describe('User Routes', function() {
 
     describe('with a valid request', () => {
       it('should return a 204 status code', done => {
-        request.delete(`${url}/api/user/${this.tempUser._id}`)
+        request.delete(`${url}/api/user`)
         .set({
           Authorization: `Bearer ${this.tempToken}`
         })
