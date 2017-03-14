@@ -69,7 +69,7 @@ describe('User Routes', function() {
   });
 
   describe('GET: /api/user', function() {
-    before( done => {
+    beforeEach( done => {
       let user = new User(testUser);
       user.generatePasswordHash(user.password)
       .then( user => user.save())
@@ -88,6 +88,69 @@ describe('User Routes', function() {
           if (err) return done(err);
           expect(res.status).to.equal(200);
           expect(res.text).to.be.a('string');
+          done();
+        });
+      });
+    });
+
+    describe('without a request body', () => {
+      it('should return a 401 error', done => {
+        request.get(`${url}/api/user`)
+        .end((err, res) => {
+          expect(err.status).to.equal(401);
+          expect(res.text).to.equal('UnauthorizedError');
+          done();
+        });
+      });
+    });
+
+    describe('without a username', () => {
+      it('should return a 401 error', done => {
+        request.get(`${url}/api/user`)
+        .auth('', 'password')
+        .end((err, res) => {
+          expect(err.status).to.equal(401);
+          expect(res.text).to.equal('UnauthorizedError');
+          expect(err.message).to.equal('Unauthorized');
+          done();
+        });
+      });
+    });
+
+    describe('without a password', () => {
+      it('should return a 401 error', done => {
+        request.get(`${url}/api/user`)
+        .auth('tester name', '')
+        .end((err, res) => {
+          expect(err.status).to.equal(401);
+          expect(res.text).to.equal('UnauthorizedError');
+          expect(err.message).to.equal('Unauthorized');
+          done();
+        });
+      });
+    });
+
+    describe('with an unrecognized user', () => {
+      it('should return a 404 error', done => {
+        request.get(`${url}/api/user`)
+        .auth('not the name', 'password')
+        .end((err, res) => {
+          expect(err.status).to.equal(404);
+          expect(res.text).to.equal('NotFoundError');
+          expect(err.message).to.equal('Not Found');
+          done();
+        });
+      });
+    });
+
+    describe('with an incorrect password', () => {
+      it('should return a 401 error', done => {
+        request.get(`${url}/api/user`)
+        .auth('tester name', 'wrong')
+        .end((err, res) => {
+          console.log('err', err.message);
+          console.log('res', res.text);
+          expect(err.status).to.equal(401);
           done();
         });
       });

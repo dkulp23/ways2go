@@ -28,9 +28,10 @@ userRouter.post('/api/user', jsonParser, function(req, res, next) {
 
 userRouter.get('/api/user', basicAuth, function(req, res, next) {
   debug('GET: /api/user');
-
+  console.log('auth', req.auth.username);
   User.findOne({ username: req.auth.username })
   .then( user => {
+    console.log('user', user);
     if (!user) return next(createError(404, 'user not found'));
     return user.comparePasswordHash(req.auth.password);
   })
