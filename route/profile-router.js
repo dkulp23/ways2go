@@ -2,7 +2,7 @@
 
 const Router = require('express').Router;
 const jsonParser = require('body-parser').json();
-const createError = require('http-errors');
+// const createError = require('http-errors');
 const debug = require('debug')('ways2go:profile-router');
 
 const bearerAuth = require('../lib/bearer-auth-middleware.js');
