@@ -9,6 +9,7 @@ const mongoose = require('mongoose');
 
 
 const wayRouter = require('./route/way-router.js');
+const userRouter = require('./route/user-router.js');
 const profileRouter = require('./route/profile-router.js');
 
 const errors = require('./lib/error-middleware.js');
