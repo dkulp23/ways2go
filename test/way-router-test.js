@@ -74,8 +74,8 @@ describe('Way Routes', function() {
     .catch(done);
 
     let promLoc2 = new Location(parseLocation(testLocation2)).save()
-    .then( location1 => {
-      this.tempLocation1 = location1;
+    .then( location2 => {
+      this.tempLocation2 = location2;
     })
     .catch(done);
 
@@ -88,7 +88,7 @@ describe('Way Routes', function() {
     let tempWayObj = {
       profileID: this.tempProfile._id,
       startLocationID: this.tempLocation1._id,
-      endLocationID: this.tempLocation1._id
+      endLocationID: this.tempLocation2._id
     };
     new Way(tempWayObj).save()
     .then( way => {
@@ -173,6 +173,9 @@ describe('Way Routes', function() {
         .end((err, res) => {
           if (err) done(err);
           expect(res.status).to.equal(200);
+          expect(res.body._id).to.equal(this.tempWay._id.toString());
+          expect(res.body.startLocationID).to.equal(this.tempWay.startLocationID.toString());
+          expect(res.body.endLocationID).to.equal(this.tempWay.endLocationID.toString());
           done();
         });
       });
@@ -182,7 +185,7 @@ describe('Way Routes', function() {
   describe('PUT: /api/way/:id', () => {
     let updateWay = {
       startTime: 9 * 60 + 45, //minutes
-      recurringDayOfWeek: [0,1,2,3,4]
+      recurringDayOfWeek: [ 0,1,2,3,4 ]
     };
     describe('with a valid id and request body', () => {
       it('should return an updated way', done => {
@@ -194,6 +197,25 @@ describe('Way Routes', function() {
         .end((err, res) => {
           if (err) done(err);
           expect(res.status).to.equal(200);
+          expect(res.body._id).to.equal(this.tempWay._id.toString());
+          expect(res.body.startTime).to.equal(updateWay.startTime);
+          expect(res.body).to.have.property('startTime');
+          done();
+        });
+      });
+    });
+  });
+
+  describe('DELETE: /api/way/:id', () => {
+    describe('with a valid id', () => {
+      it('should return a 204 code', done => {
+        request.delete(`${url}/api/way/${this.tempWay._id}`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`,
+        })
+        .end((err, res) => {
+          if (err) done(err);
+          expect(res.status).to.equal(204);
           done();
         });
       });

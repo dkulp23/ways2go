@@ -66,3 +66,14 @@ wayRouter.put('/api/way/:id', bearerAuth, jsonParser, function(req, res, next) {
   .then( way => res.json(way))
   .catch(next);
 });
+
+wayRouter.delete('/api/way/:id', bearerAuth, function(req, res, next) {
+  debug('DELETE: /api/way/:id');
+
+  Way.findByIdAndRemove(req.params.id)
+  .then( way => {
+    console.log(way);
+    res.status(204).send(`Way ID:${way._id} Delete Successful`);
+  })
+  .catch(next);
+});
