@@ -1,7 +1,7 @@
 'use strict';
 
 const debug = require('ways2go:way');
-const createError = require('http-errors');
+const createError = require('http-errors'); //eslint-disable-line
 const jsonParser = require('body-parser').json();
 const parseLocation = require('parse-address').parseLocation;
 const Promise = require('bluebird');
