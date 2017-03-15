@@ -180,6 +180,19 @@ describe('Way Routes', function() {
         });
       });
     });
+
+    describe('with an invalid id', () => {
+      it('should return a 404 code', done => {
+        request.get(`${url}/api/way/badID`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`,
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(404);
+          done();
+        });
+      });
+    });
   });
 
   describe('PUT: /api/way/:id', () => {
