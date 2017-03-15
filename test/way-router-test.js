@@ -273,30 +273,35 @@ describe('Way Routes', function() {
     });
   });
 
-  // describe('DELETE: /api/way/:wayID/wayerz/:wayerID', () => {
-  //   beforeEach( done => {
-  //     this.tempWay.wayerz.push(this.tempProfile2._id);
-  //     done();
-  //   });
-  //
-  //   describe('with a valid way owner and valid way & wayer id', () => {
-  //     it('should return a way with updated wayerz', done => {
-  //       console.log('test this tempWay', this.tempWay);
-  //       request.delete(`${url}/api/way/${this.tempWay._id}/wayerz/${this.tempProfile2._id}`)
-  //       .set({
-  //         Authorization: `Bearer ${this.tempToken}`,
-  //       })
-  //       .end((err, res) => {
-  //         if (err) done(err);
-  //         expect(res.status).to.equal(200);
-  //         expect(res.body.wayerz.length).to.equal(1);
-  //         expect(res.body.wayerz[0]).to.equal(this.tempProfile._id.toString());
-  //         expect(res.body._id).to.equal(this.tempWay._id.toString());
-  //         done();
-  //       });
-  //     });
-  //   });
-  // });
+  describe('DELETE: /api/way/:wayID/wayerz/:wayerID', () => {
+    beforeEach( done => {
+      this.tempWay.wayerz.push(this.tempProfile2._id);
+      this.tempWay.save()
+      .then( way => {
+        this.tempWay2Wayers = way;
+        done();
+      })
+      .catch(done);
+    });
+
+    describe('with a valid way owner and valid way & wayer id', () => {
+      it('should return a way with updated wayerz', done => {
+        console.log('test this tempWay', this.tempWay);
+        request.delete(`${url}/api/way/${this.tempWay2Wayers._id}/wayerz/${this.tempProfile2._id}`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`,
+        })
+        .end((err, res) => {
+          if (err) done(err);
+          expect(res.status).to.equal(200);
+          expect(res.body.wayerz.length).to.equal(1);
+          expect(res.body.wayerz[0]).to.equal(this.tempProfile._id.toString());
+          expect(res.body._id).to.equal(this.tempWay._id.toString());
+          done();
+        });
+      });
+    });
+  });
 
   describe('GET: /api/way/:id', () => {
     describe('with a valid id provided', () => {
