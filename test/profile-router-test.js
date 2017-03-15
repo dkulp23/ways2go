@@ -69,9 +69,38 @@ describe('Profile Routes', function() {
         });
       });
     });
+
+    describe('without a token', () => {
+      it('should return a 401 error', done => {
+        request.post(`${url}/api/profile`)
+        .send(testProfile)
+        .end((err, res) => {
+          expect(res.status).to.equal(401);
+          expect(res.text).to.equal('UnauthorizedError');
+          done();
+        });
+      });
+    });
+
+    describe('with an invalid request', () => {
+      it('should return a 400 error', done => {
+        request.post(`${url}/api/profile`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`
+        })
+        .send({
+          bio: 'Incomplete Profile'
+        })
+        .end((err, res) => {
+          expect(err.status).to.equal(400);
+          expect(res.text).to.equal('BadRequestError');
+          done();
+        });
+      });
+    });
   });
 
-  describe('GET: /api/gallery', function() {
+  describe('GET: /api/profile/:id', function() {
     beforeEach( done => {
       new User(testUser)
       .generatePasswordHash(testUser.password)
@@ -110,6 +139,32 @@ describe('Profile Routes', function() {
         .end((err, res) => {
           if (err) return done(err);
           expect(res.status).to.equal(200);
+          done();
+        });
+      });
+    });
+
+    describe('without a token', () => {
+      it('should return a 401 error', done => {
+        request.get(`${url}/api/profile/${this.tempProfile._id}`)
+        .end((err, res) => {
+          expect(err.status).to.equal(401);
+          expect(res.text).to.equal('UnauthorizedError');
+          done();
+        });
+      });
+    });
+
+    describe('with an unrecognized profile id', () => {
+      it('should return a 404 error', done => {
+        let fakeID = '111222333444555666777888';
+        request.get(`${url}/api/profile/${fakeID}`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`
+        })
+        .end((err, res) => {
+          expect(err.status).to.equal(404);
+          expect(res.text).to.equal('NotFoundError');
           done();
         });
       });
@@ -163,6 +218,37 @@ describe('Profile Routes', function() {
         });
       });
     });
+
+    describe('without a token', () => {
+      it('should return a 401 error', done => {
+        request.put(`${url}/api/profile`)
+        .send({
+          displayName: 'cooldisplayname'
+        })
+        .end((err, res) => {
+          expect(err.status).to.equal(401);
+          expect(res.text).to.equal('UnauthorizedError');
+          done();
+        });
+      });
+    });
+
+    describe('with an invalid request object', () => {
+      it('should return a 400 error', done => {
+        request.put(`${url}/api/profile`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`
+        })
+        .send({
+          fakeProp: 'this should break'
+        })
+        .end((err, res) => {
+          expect(err.status).to.equal(400);
+          expect(res.text).to.equal('BadRequestError');
+          done();
+        });
+      });
+    });
   });
 
   describe('DELETE: /api/profile', function() {
@@ -204,6 +290,17 @@ describe('Profile Routes', function() {
         .end((err, res) => {
           if (err) return done(err);
           expect(res.status).to.equal(204);
+          done();
+        });
+      });
+    });
+
+    describe('without a token', () => {
+      it('should return a 401 error', done => {
+        request.delete(`${url}/api/profile`)
+        .end((err, res) => {
+          expect(err.status).to.equal(401);
+          expect(res.text).to.equal('UnauthorizedError');
           done();
         });
       });
