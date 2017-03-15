@@ -129,6 +129,7 @@ describe('Review Routes', function() {
     mocReview.wayID = this.tempWay._id;
     Profile.findByIdAndAddReview(this.tempProfile._id, mocReview)
     .then( review => {
+      console.log('in review block', review);
       this.tempReview = review;
       done();
     })
@@ -206,9 +207,20 @@ describe('Review Routes', function() {
     });
   });
 
-  // describe('DELETE /api/review/:id', () => {
-  //
-  //   it('should successfully delete ')
-  // });
+  describe('DELETE /api/review/:id', () => {
+    console.log('in describe---->');
+    it('should successfully delete a review', done => {
+      console.log('in it block----->');
+      request.delete(`${url}/api/review/${this.tempReview._id}`)
+      .set({
+        Authorization: `Bearer ${this.tempToken}`,
+      })
+      .end((err, res) => {
+        if (err) return done(err);
+        expect(res.status).to.equal(204);
+        done();
+      });
+    });
+  });
 
 });
