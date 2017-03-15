@@ -41,14 +41,7 @@ userRouter.get('/api/user', basicAuth, function(req, res, next) {
 userRouter.put('/api/user', bearerAuth, jsonParser, function(req, res, next) {
   debug('PUT /api/user');
 
-  User.findById(req.user._id)
-  .then( user => {
-    if (!user) return next(createError(404, 'user not found'));
-    if (user._id.toString() !== req.user._id.toString()) {
-      return next(createError(401, 'Unauthorized User'));
-    }
-    return User.findByIdAndUpdate(req.user._id, req.body, { new: true });
-  })
+  User.findByIdAndUpdate(req.user._id, req.body, { new: true })
   .then( user => {
     let reqKeys = Object.keys(req.body);
     if (!user[reqKeys]) return next(createError(400, 'bad request'));
@@ -60,14 +53,7 @@ userRouter.put('/api/user', bearerAuth, jsonParser, function(req, res, next) {
 userRouter.delete('/api/user', bearerAuth, function(req, res, next) {
   debug('DELETE: /api/user');
 
-  User.findById(req.user._id)
-  .then( user => {
-    if (!user) return next(createError(404, 'user not found'));
-    if (user._id.toString() !== req.user._id.toString()) {
-      return next(createError(401, 'Unauthorized User'));
-    }
-    return User.findByIdAndRemove(req.user._id);
-  })
+  User.findByIdAndRemove(req.user._id)
   .then( removed => {
     if (!removed) return next(createError(404, 'user not found'));
     return next(res.status(204).send('account removed'));
