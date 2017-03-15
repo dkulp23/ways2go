@@ -37,10 +37,10 @@ const mocProfile = {
   avgRating: 3
 };
 
-// const mocWay = {
-//   startLocationID: '1234 1st ave 98765',
-//   endLocationID: '432 moc st seattle, wa 56789'
-// };
+const mocWay = {
+  startLocationID: '1234 1st ave 98765',
+  endLocationID: '432 moc st seattle, wa 56789'
+};
 
 const mocLocation1 = '777 Seven st 77777';
 const mocLocation2 = '11 eleven ave virginia beach,va 11111';
@@ -125,11 +125,9 @@ describe('Review Routes', function() {
   });
 
   beforeEach( done => {
-    this.mocReview = mocReview;
-    this.mocReview.userID = this.tempUser._id;
-    this.mocReview.wayID = this.tempWay._id;
-    this.mocReview.reviewedUserID = this.tempUser._id;
-    new Review(mocReview).save()
+    mocReview.userID = this.tempUser._id;
+    mocReview.wayID = this.tempWay._id;
+    Profile.findByIdAndAddReview(this.tempProfile._id, mocReview)
     .then( review => {
       this.mocReview = review;
       done();
@@ -148,13 +146,12 @@ describe('Review Routes', function() {
     .catch(done);
   });
 
-  describe('POST: /api/way/:wayID/wayerz/:wayerzID/review', function() {
-    let baseThis = this.parent;
+  describe('POST: /api/wayerz/:wayerzID/review', function() {
     it('should return a review', done => {
-      request.post(`${url}/api/way/${baseThis.tempWay._id}/wayerz/${baseThis.tempUser2._id}/review`)
+      request.post(`${url}/api/wayerz/${this.parent.tempProfile._id}/review`)
       .send(mocReview)
       .set({
-        Authorization: `Bearer ${baseThis.tempToken}`,
+        Authorization: `Bearer ${this.parent.tempToken}`,
       })
       .end((err, res) => {
         if (err) return done(err);
@@ -173,4 +170,22 @@ describe('Review Routes', function() {
       });
     });
   });
+
+  describe('GET: /api/wayerz/:wayerzID/review', function() {
+    it('should return a review', done => {
+      request.get(`${url}/api/wayerz/${this.parent.tempProfile._id}/review`)
+      .set({
+        Authorization: `Bearer ${this.parent.tempToken}`,
+      })
+      .end((err, res) => {
+        if (err) return done(err);
+        expect(res.status).to.equal(200);
+        expect(res.body.length).to.equal(1);
+        expect(res.body[0].rating).to.equal(mocReview.rating);
+        expect(res.body[0].comment).to.equal(mocReview.comment);
+        done();
+      });
+    });
+  });
+
 });
