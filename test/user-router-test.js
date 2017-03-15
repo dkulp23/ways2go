@@ -38,10 +38,38 @@ describe('User Routes', function() {
         });
       });
     });
+
+    describe('without a request body', () => {
+      it('should return a 400 error', done => {
+        request.post(`${url}/api/user`)
+        .end((err, res) => {
+          console.log('res', res.text);
+          expect(err.status).to.equal(400);
+          expect(res.status).to.equal(err.status);
+          done();
+        });
+      });
+    });
+
+    describe('with an invalid email', () => {
+      it('should return a 400 error', done => {
+        request.post(`${url}/api/user`)
+        .send({
+          username: 'test',
+          password: 'checkit',
+          email: 'notanemail'
+        })
+        .end((err, res) => {
+          expect(err.status).to.equal(400);
+          expect(res.status).to.equal(err.status);
+          done();
+        });
+      });
+    });
   });
 
   describe('GET: /api/user', function() {
-    before( done => {
+    beforeEach( done => {
       let user = new User(testUser);
       user.generatePasswordHash(user.password)
       .then( user => user.save())
@@ -64,10 +92,73 @@ describe('User Routes', function() {
         });
       });
     });
+
+    describe('without a request body', () => {
+      it('should return a 401 error', done => {
+        request.get(`${url}/api/user`)
+        .end((err, res) => {
+          expect(err.status).to.equal(401);
+          expect(res.text).to.equal('UnauthorizedError');
+          done();
+        });
+      });
+    });
+
+    describe('without a username', () => {
+      it('should return a 401 error', done => {
+        request.get(`${url}/api/user`)
+        .auth('', 'password')
+        .end((err, res) => {
+          expect(err.status).to.equal(401);
+          expect(res.text).to.equal('UnauthorizedError');
+          expect(err.message).to.equal('Unauthorized');
+          done();
+        });
+      });
+    });
+
+    describe('without a password', () => {
+      it('should return a 401 error', done => {
+        request.get(`${url}/api/user`)
+        .auth('tester name', '')
+        .end((err, res) => {
+          expect(err.status).to.equal(401);
+          expect(res.text).to.equal('UnauthorizedError');
+          expect(err.message).to.equal('Unauthorized');
+          done();
+        });
+      });
+    });
+
+    describe('with an unrecognized user', () => {
+      it('should return a 404 error', done => {
+        request.get(`${url}/api/user`)
+        .auth('not the name', 'password')
+        .end((err, res) => {
+          expect(err.status).to.equal(404);
+          expect(res.text).to.equal('NotFoundError');
+          expect(err.message).to.equal('Not Found');
+          done();
+        });
+      });
+    });
+
+    describe('with an incorrect password', () => {
+      it('should return a 401 error', done => {
+        request.get(`${url}/api/user`)
+        .auth('tester name', 'wrong')
+        .end((err, res) => {
+          console.log('err', err.message);
+          console.log('res', res.text);
+          expect(err.status).to.equal(401);
+          done();
+        });
+      });
+    });
   });
 
   describe('PUT: /api/user', function() {
-    before( done => {
+    beforeEach( done => {
       let user = new User(testUser);
       user.generatePasswordHash(user.password)
       .then( user => user.save())
@@ -84,7 +175,7 @@ describe('User Routes', function() {
 
     describe('with a valid request', () => {
       it('should return an updated user', done => {
-        request.put(`${url}/api/user/${this.tempUser._id}`)
+        request.put(`${url}/api/user`)
         .send({ email: 'new@email.com' })
         .set({
           Authorization: `Bearer ${this.tempToken}`
@@ -97,10 +188,53 @@ describe('User Routes', function() {
         });
       });
     });
+
+    describe('without a request body', () => {
+      it('should return a 400 error', done => {
+        request.put(`${url}/api/user`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`
+        })
+        .end((err, res) => {
+          expect(err.status).to.equal(400);
+          expect(err.message).to.equal('Bad Request');
+          expect(res.text).to.equal('BadRequestError');
+          done();
+        });
+      });
+    });
+
+    describe('without a token', () => {
+      it('should return a 401 error', done => {
+        request.put(`${url}/api/user`)
+        .send({ email: 'new@email.com'})
+        .end((err, res) => {
+          expect(err.status).to.equal(401);
+          expect(err.message).to.equal('Unauthorized');
+          expect(res.text).to.equal('UnauthorizedError');
+          done();
+        });
+      });
+    });
+
+    describe('with an invalid request', () => {
+      it('should return a 400 error', done => {
+        request.put(`${url}/api/user`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`
+        })
+        .send({ favColor: 'blue' })
+        .end((err, res) => {
+          expect(err.status).to.equal(400);
+          console.log('res', res.text);
+          done();
+        });
+      });
+    });
   });
 
   describe('DELETE: /api/user', function() {
-    before( done => {
+    beforeEach( done => {
       let user = new User(testUser);
       user.generatePasswordHash(testUser.password)
       .then( user => user.save())
@@ -117,13 +251,24 @@ describe('User Routes', function() {
 
     describe('with a valid request', () => {
       it('should return a 204 status code', done => {
-        request.delete(`${url}/api/user/${this.tempUser._id}`)
+        request.delete(`${url}/api/user`)
         .set({
           Authorization: `Bearer ${this.tempToken}`
         })
         .end((err, res) => {
           if (err) return done(err);
           expect(res.status).to.equal(204);
+          done();
+        });
+      });
+    });
+
+    describe('without a token', () => {
+      it('should return a 401 error', done => {
+        request.delete(`${url}/api/user`)
+        .end((err, res) => {
+          expect(err.status).to.equal(401);
+          expect(res.text).to.equal('UnauthorizedError');
           done();
         });
       });
