@@ -243,6 +243,20 @@ describe('Way Routes', function() {
         });
       });
     });
+
+    describe('with an invalid way owner and valid way & wayer id', () => {
+      it('should return a way with updated wayerz', done => {
+        console.log('test this tempWay', this.tempWay);
+        request.post(`${url}/api/way/${this.tempWay._id}/wayerz/${this.tempProfile2._id}`)
+        .set({
+          Authorization: `Bearer ${this.tempToken2}`,
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(401);
+          done();
+        });
+      });
+    });
   });
 
   describe('GET: /api/way/:id', () => {
