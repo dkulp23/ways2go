@@ -330,6 +330,36 @@ describe('Way Routes', function() {
     });
   });
 
+  describe('GET: /api/way', () => {
+    describe('with an authorized user', () => {
+      it('should return an array of all ways', done => {
+        request.get(`${url}/api/way`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`,
+        })
+        .end((err, res) => {
+          if (err) done(err);
+          expect(res.status).to.equal(200);
+          expect(res.body).to.be.an('array');
+          expect(res.body[0]._id).to.equal(this.tempWay._id.toString());
+          expect(res.body[0].startLocationID).to.equal(this.tempWay.startLocationID.toString());
+          expect(res.body[0].endLocationID).to.equal(this.tempWay.endLocationID.toString());
+          done();
+        });
+      });
+    });
+
+    describe('with a unauth user', () => {
+      it('should return a 401', done => {
+        request.get(`${url}/api/way`)
+        .end((err, res) => {
+          expect(res.status).to.equal(401);
+          done();
+        });
+      });
+    });
+  });
+
   describe('PUT: /api/way/:id', () => {
     let updateWay = {
       startTime: 9 * 60 + 45, //minutes
