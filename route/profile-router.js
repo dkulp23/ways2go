@@ -31,6 +31,17 @@ profileRouter.get('/api/profile/:id', bearerAuth, function(req, res, next) {
   .catch(next);
 });
 
+profileRouter.get('/api/profile', bearerAuth, function(req, res, next) {
+  debug('GET: /api/profile');
+
+  Profile.find({})
+  .then( profiles => {
+    if (!profiles) return next(createError(404, 'no profiles available'));
+    res.json(profiles);
+  })
+  .catch(next);
+});
+
 profileRouter.put('/api/profile', bearerAuth, jsonParser, function(req, res, next) {
   debug('PUT: /api/profile');
 
