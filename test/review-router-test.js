@@ -23,6 +23,12 @@ const mocUser = {
   email: 'ben@email.com'
 };
 
+const mocUser2 = {
+  username: 'Jane',
+  password: 'secret',
+  email: 'jame@example.com'
+};
+
 const mocProfile = {
   displayName: 'mocdisplayname',
   fullName: 'Test Name',
@@ -61,6 +67,21 @@ describe('Review Routes', function() {
   });
 
   beforeEach( done => {
+    new User(mocUser2)
+    .generatePasswordHash(mocUser.password)
+    .then( user => user.save())
+    .then( user => {
+      this.tempUser2 = user;
+      return user.generateToken();
+    })
+    .then( token => {
+      this.tempToken2 = token;
+      done();
+    })
+    .catch(done);
+  });
+
+  beforeEach( done => {
     this.tempProfile = mocProfile;
     this.tempProfile.userID = this.tempUser._id;
     new Profile(mocProfile).save()
@@ -79,8 +100,8 @@ describe('Review Routes', function() {
     .catch(done);
 
     let promLoc2 = new Location(parseLocation(mocLocation2)).save()
-    .then( location1 => {
-      this.tempLocation1 = location1;
+    .then( location2 => {
+      this.tempLocation2 = location2;
     })
     .catch(done);
 
@@ -93,7 +114,7 @@ describe('Review Routes', function() {
     let tempWayObj = {
       profileID: this.tempProfile._id,
       startLocationID: this.tempLocation1._id,
-      endLocationID: this.tempLocation1._id
+      endLocationID: this.tempLocation2._id
     };
     new Way(tempWayObj).save()
     .then( way => {
@@ -103,18 +124,18 @@ describe('Review Routes', function() {
     .catch(done);
   });
 
-  // beforeEach( done => {
-  //   this.mocReview = mocReview;
-  //   this.mocReview.userID = this.tempUser._id;
-  //   this.mocReview.wayID = this.tempWay._id;
-  //   this.mocReview.reviewedUserID = this.tempWay.wayerz;
-  //   new Review(mocReview).save()
-  //   .then( review => {
-  //     this.mocReview = review;
-  //     done();
-  //   })
-  //   .catch(done);
-  // });
+  beforeEach( done => {
+    this.mocReview = mocReview;
+    this.mocReview.userID = this.tempUser._id;
+    this.mocReview.wayID = this.tempWay._id;
+    this.mocReview.reviewedUserID = this.tempUser._id;
+    new Review(mocReview).save()
+    .then( review => {
+      this.mocReview = review;
+      done();
+    })
+    .catch(done);
+  });
 
   afterEach( done => {
     Promise.all([
@@ -127,12 +148,13 @@ describe('Review Routes', function() {
     .catch(done);
   });
 
-  describe('POST: /api/way/:wayid/wayerz/review', function() {
+  describe('POST: /api/way/:wayID/wayerz/:wayerzID/review', function() {
+    let baseThis = this.parent;
     it('should return a review', done => {
-      request.post(`${url}/api/way/${this.tempWay._id}/wayerz/review`)
+      request.post(`${url}/api/way/${baseThis.tempWay._id}/wayerz/${baseThis.tempUser2._id}/review`)
       .send(mocReview)
       .set({
-        Authorization: `Bearer ${this.tempToken}`,
+        Authorization: `Bearer ${baseThis.tempToken}`,
       })
       .end((err, res) => {
         if (err) return done(err);
@@ -144,6 +166,7 @@ describe('Review Routes', function() {
           if (err) return done(err);
           expect(res.status).to.equal(200);
           expect(review.rating).to.equal(4);
+          expect(review.comment).to.equal('great!');
           done();
         })
         .catch(done);

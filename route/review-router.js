@@ -10,10 +10,12 @@ const bearerAuth = require('../lib/bearer-auth-middleware.js');
 
 const reviewRouter = module.exports = Router();
 
-reviewRouter.post('/api/way/:wayid/wayerz/:wayerzID/review', bearerAuth, jsonParser, function(req, res, next) {
-  debug('POST: /api/way/:wayid/wayerz/:wayerzID/review');
+reviewRouter.post('/api/way/:wayID/wayerz/:wayerzID/review', bearerAuth, jsonParser, function(req, res, next) {
+  debug('POST: /api/way/:wayID/wayerz/:wayerzID/review');
 
   req.body.userID = req.user._id;
+  req.body.wayID = req.params.wayID;
+  req.body.wayerzID = req.params.wayersID;
   new Review(req.body).save()
   .then( review => res.json(review))
   .catch(next);
