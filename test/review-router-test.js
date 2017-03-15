@@ -146,12 +146,12 @@ describe('Review Routes', function() {
     .catch(done);
   });
 
-  describe('POST: /api/wayerz/:wayerzID/review', function() {
-    it('should return a review', done => {
-      request.post(`${url}/api/wayerz/${this.parent.tempProfile._id}/review`)
+  describe('POST: /api/wayerz/:wayerzID/review', () => {
+    it('should send a valid review', done => {
+      request.post(`${url}/api/wayerz/${this.tempProfile._id}/review`)
       .send(mocReview)
       .set({
-        Authorization: `Bearer ${this.parent.tempToken}`,
+        Authorization: `Bearer ${this.tempToken}`,
       })
       .end((err, res) => {
         if (err) return done(err);
@@ -171,11 +171,11 @@ describe('Review Routes', function() {
     });
   });
 
-  describe('GET: /api/wayerz/:wayerzID/review', function() {
-    it('should return a review', done => {
-      request.get(`${url}/api/wayerz/${this.parent.tempProfile._id}/review`)
+  describe('GET: /api/wayerz/:wayerzID/review', () => {
+    it('should return a valid review', done => {
+      request.get(`${url}/api/wayerz/${this.tempProfile._id}/review`)
       .set({
-        Authorization: `Bearer ${this.parent.tempToken}`,
+        Authorization: `Bearer ${this.tempToken}`,
       })
       .end((err, res) => {
         if (err) return done(err);
@@ -187,5 +187,9 @@ describe('Review Routes', function() {
       });
     });
   });
+
+  describe('PUT /api/review/:id', () => {
+    
+  })
 
 });
