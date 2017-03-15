@@ -244,8 +244,8 @@ describe('Way Routes', function() {
       });
     });
 
-    describe('with an invalid way owner and valid way & wayer id', () => {
-      it('should return a way with updated wayerz', done => {
+    describe('with valid way & wayer id but a user that doesnt own the way', () => {
+      it('should return a 401 code', done => {
         console.log('test this tempWay', this.tempWay);
         request.post(`${url}/api/way/${this.tempWay._id}/wayerz/${this.tempProfile2._id}`)
         .set({
@@ -253,6 +253,45 @@ describe('Way Routes', function() {
         })
         .end((err, res) => {
           expect(res.status).to.equal(401);
+          done();
+        });
+      });
+    });
+
+    describe('with an valid way owner, valid way but invalid wayer id', () => {
+      it('should return a 404 code', done => {
+        console.log('test this tempWay', this.tempWay);
+        request.post(`${url}/api/way/${this.tempWay._id}/wayerz/badID`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`,
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(404);
+          done();
+        });
+      });
+    });
+  });
+
+  describe('DELETE: /api/way/:wayID/wayerz/:wayerID', () => {
+    beforeEach( done => {
+      this.tempWay.wayerz.push(this.tempProfile2._id);
+      done();
+    });
+
+    describe('with a valid way owner and valid way & wayer id', () => {
+      it('should return a way with updated wayerz', done => {
+        console.log('test this tempWay', this.tempWay);
+        request.delete(`${url}/api/way/${this.tempWay._id}/wayerz/${this.tempProfile2._id}`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`,
+        })
+        .end((err, res) => {
+          if (err) done(err);
+          expect(res.status).to.equal(200);
+          expect(res.body.wayerz.length).to.equal(1);
+          expect(res.body.wayerz[0]).to.equal(this.tempProfile._id.toString());
+          expect(res.body._id).to.equal(this.tempWay._id.toString());
           done();
         });
       });
