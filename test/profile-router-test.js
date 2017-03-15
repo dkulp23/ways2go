@@ -20,11 +20,24 @@ const testUser = {
   email: 'test@email.com'
 };
 
+const otherUser = {
+  username: 'numbertwo',
+  password: 'notpassword',
+  email: 'testing@email.com'
+};
+
 const testProfile = {
   displayName: 'testingonetwo',
   fullName: 'Mr. Test User',
   address: '2901 3rd Ave, Seattle, WA 98121',
   bio: 'Can\'t wait to meet my new best friend on ways2go!'
+};
+
+const otherProfile = {
+  displayName: 'testingtwotwo',
+  fullName: 'Ms. Test User',
+  address: '2901 3rd Ave, Seattle, WA 98121',
+  bio: 'I am a human person.'
 };
 
 describe('Profile Routes', function() {
@@ -298,6 +311,94 @@ describe('Profile Routes', function() {
     describe('without a token', () => {
       it('should return a 401 error', done => {
         request.delete(`${url}/api/profile`)
+        .end((err, res) => {
+          expect(err.status).to.equal(401);
+          expect(res.text).to.equal('UnauthorizedError');
+          done();
+        });
+      });
+    });
+  });
+
+  describe('GET: /api/profile', function() {
+    beforeEach( done => {
+      new User(testUser)
+      .generatePasswordHash(testUser.password)
+      .then( user => user.save())
+      .then( user => {
+        this.tempUser = user;
+        return user.generateToken();
+      })
+      .then( token => {
+        this.tempToken = token;
+        done();
+      })
+      .catch(done);
+    });
+
+    beforeEach( done => {
+      testProfile.userID = this.tempUser._id.toString();
+      new Profile(testProfile).save()
+      .then( profile => {
+        this.tempProfile = profile;
+        done();
+      })
+      .catch(done);
+    });
+
+    beforeEach( done => {
+      new User(otherUser)
+      .generatePasswordHash(otherUser.password)
+      .then( user => user.save())
+      .then( user => {
+        this.tempUserTwo = user;
+        return user.generateToken();
+      })
+      .then( token => {
+        this.tempTokenTwo = token;
+        done();
+      })
+      .catch(done);
+    });
+
+    beforeEach( done => {
+      otherProfile.userID = this.tempUserTwo._id.toString();
+      new Profile(otherProfile).save()
+      .then( profile => {
+        this.tempProfileTwo = profile;
+        done();
+      })
+      .catch(done);
+    });
+
+    afterEach( () => {
+      delete testProfile.userID;
+    });
+
+    afterEach( () => {
+      delete otherProfile.userID;
+    });
+
+    describe('with a valid request', () => {
+      it('should return an array of profiles', done => {
+        request.get(`${url}/api/profile`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`
+        })
+        .end((err, res) => {
+          if (err) return done(err);
+          expect(res.status).to.equal(200);
+          expect(res.body).to.be.an('array');
+          expect(res.body[0].username).to.equal(testProfile.username);
+          expect(res.body[1].username).to.equal(otherProfile.username);
+          done();
+        });
+      });
+    });
+
+    describe('without a token', () => {
+      it('should return a 401 error', done => {
+        request.get(`${url}/api/profile`)
         .end((err, res) => {
           expect(err.status).to.equal(401);
           expect(res.text).to.equal('UnauthorizedError');
