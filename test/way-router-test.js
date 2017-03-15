@@ -208,7 +208,7 @@ describe('Way Routes', function() {
 
     describe('with an invalid request body: no end location provided', () => {
       let invalidWayNoEndLocation = {
-        endLocation: '123 fake st seattle'
+        startLocation: '123 fake st seattle'
       };
       it('should respond with a 400 code', done => {
         request.post(`${url}/api/way`)
@@ -297,6 +297,20 @@ describe('Way Routes', function() {
           expect(res.body.wayerz.length).to.equal(1);
           expect(res.body.wayerz[0]).to.equal(this.tempProfile._id.toString());
           expect(res.body._id).to.equal(this.tempWay._id.toString());
+          done();
+        });
+      });
+    });
+
+    describe('with an invalid owner of the way', () => {
+      it('should respond with a 401 code', done => {
+        request.delete(`${url}/api/way/${this.tempWay2Wayers._id}/wayerz/${this.tempProfile2._id}`)
+        .set({
+          Authorization: `Bearer ${this.tempToken2}`,
+        })
+        .end((err, res) => {
+          expect(err).to.be.an('error');
+          expect(res.status).to.equal(401);
           done();
         });
       });
