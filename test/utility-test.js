@@ -69,7 +69,7 @@ describe('App Utilities', function() {
       it('should respond with a 401 code', done => {
         request.get(`${url}/api/way`)
         .set({
-          Authorization: 'Bearer'
+          Authorization: {bad: 'auth'}
         })
         .end((err, res) => {
           expect(res.status).to.equal(401);
