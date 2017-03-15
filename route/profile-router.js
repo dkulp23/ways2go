@@ -60,6 +60,7 @@ profileRouter.delete('/api/profile', bearerAuth, function(req, res, next) {
   Profile.findOneAndRemove({ userID: req.user._id })
   .then( deleted => {
     if (!deleted) return next(createError(404, 'profile not found'));
+    deleted.remove();
     return next(res.status(204).send('profile deleted'));
   })
   .catch(next);
