@@ -24,11 +24,8 @@ reviewRouter.post('/api/wayerz/:wayerzID/review', bearerAuth, jsonParser, functi
 reviewRouter.put('/api/review/:id', bearerAuth, jsonParser, function(req, res, next) {
   debug('PUT: /api/review/:id');
 
-  Review.findById(req.params.id)
+  Review.findByIdAndUpdate(req.params.id, req.body, { new: true})
   .then( review => {
-    if (review.userID.toString() !== req.user._id.toString()) {
-      return next(createError(401, 'invalid user'));
-    }
     review.rating = req.body.rating;
     review.comment = req.body.comment;
     return review.save();

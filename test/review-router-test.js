@@ -129,7 +129,7 @@ describe('Review Routes', function() {
     mocReview.wayID = this.tempWay._id;
     Profile.findByIdAndAddReview(this.tempProfile._id, mocReview)
     .then( review => {
-      this.mocReview = review;
+      this.tempReview = review;
       done();
     })
     .catch(done);
@@ -189,7 +189,26 @@ describe('Review Routes', function() {
   });
 
   describe('PUT /api/review/:id', () => {
-    
-  })
+
+    it('should successfully edit a review', done => {
+      var updated = { rating: 4 };
+      request.put(`${url}/api/review/${this.tempReview._id}`)
+      .send(updated)
+      .set({
+        Authorization: `Bearer ${this.tempToken}`,
+      })
+      .end((err, res) => {
+        if (err) return done(err);
+        expect(res.status).to.equal(200);
+        expect(res.body.rating).to.equal(updated.rating);
+        done();
+      });
+    });
+  });
+
+  // describe('DELETE /api/review/:id', () => {
+  //
+  //   it('should successfully delete ')
+  // });
 
 });
