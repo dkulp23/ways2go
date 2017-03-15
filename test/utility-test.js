@@ -79,4 +79,20 @@ describe('App Utilities', function() {
     });
 
   });
+
+  describe('Basic Auth', () => {
+    describe('request with no auth header', () => {
+      it('should respond with a 401 code', done => {
+        request.get(`${url}/api/user`)
+        .set({
+          Authorization: { bad: 'basic auth'}
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(401);
+          done();
+        });
+      });
+    });
+
+  });
 });
