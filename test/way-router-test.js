@@ -31,6 +31,20 @@ const testProfile = {
   avgRating: 3,
 };
 
+const testUser2 = {
+  username: 'tester2 name',
+  password: 'password2',
+  email: 'test2@email.com',
+};
+
+const testProfile2 = {
+  displayName: 'test2displayname',
+  fullName: 'Test Name2',
+  address: 'test 2address',
+  bio: 'test2 bio',
+  avgRating: 4,
+};
+
 const testLocation1 = '777 Seven st 77777';
 const testLocation2 = '11 eleven ave virginia beach,va 11111';
 
@@ -67,6 +81,32 @@ describe('Way Routes', function() {
   });
 
   beforeEach( done => {
+    new User(testUser2)
+    .generatePasswordHash(testUser2.password)
+    .then( user => user.save())
+    .then( user => {
+      this.tempUser2 = user;
+      return user.generateToken();
+    })
+    .then( token => {
+      this.tempToken2 = token;
+      done();
+    })
+    .catch(done);
+  });
+
+  beforeEach( done => {
+    this.tempProfile2 = testProfile2;
+    this.tempProfile2.userID = this.tempUser2._id;
+    new Profile(testProfile2).save()
+    .then( profile => {
+      this.tempProfile2 = profile;
+      done();
+    })
+    .catch(done);
+  });
+
+  beforeEach( done => {
     let promLoc1 = new Location(parseLocation(testLocation1)).save()
     .then( location1 => {
       this.tempLocation1 = location1;
@@ -91,6 +131,10 @@ describe('Way Routes', function() {
       endLocationID: this.tempLocation2._id
     };
     new Way(tempWayObj).save()
+    .then( way => {
+      way.wayerz.push(this.tempProfile._id);
+      return way.save();
+    })
     .then( way => {
       this.tempWay = way;
       done();
@@ -175,6 +219,26 @@ describe('Way Routes', function() {
         .end((err, res) => {
           expect(err).to.be.an('error');
           expect(res.status).to.equal(400);
+          done();
+        });
+      });
+    });
+  });
+
+  describe('POST: /api/way/:wayID/wayerz/:wayerID', () => {
+    describe('with a valid way owner and valid way & wayer id', () => {
+      it('should return a way with updated wayerz', done => {
+        console.log('test this tempWay', this.tempWay);
+        request.post(`${url}/api/way/${this.tempWay._id}/wayerz/${this.tempProfile2._id}`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`,
+        })
+        .end((err, res) => {
+          if (err) done(err);
+          expect(res.status).to.equal(200);
+          expect(res.body.wayerz.length).to.equal(2);
+          expect(res.body.wayerz[1]).to.equal(this.tempProfile2._id.toString());
+          expect(res.body._id).to.equal(this.tempWay._id.toString());
           done();
         });
       });

@@ -51,6 +51,32 @@ wayRouter.post('/api/way', bearerAuth, jsonParser, function(req, res, next) {
   });
 });
 
+wayRouter.post('/api/way/:wayID/wayerz/:wayerID', bearerAuth, function(req, res, next) {
+  debug('POST: /api/way/:wayID/wayerz/:wayerID');
+
+  let tempWayerProfile, tempWay;
+
+  Profile.findById(req.params.wayerID)
+  .then( profile => {
+    tempWayerProfile = profile;
+    return Way.findById(req.params.wayID);
+  })
+  .then( way => {
+    tempWay = way;
+    return Profile.findOne({ userID: req.user._id.toString() });
+  })
+  .then( profile => {
+    if (profile._id.toString() !== tempWay.profileID.toString()) return next(createError(401, 'not owner of way'));
+    console.log('before',tempWay.wayerz);
+
+    tempWay.wayerz.push(tempWayerProfile._id);
+    console.log('after',tempWay.wayerz);
+    return tempWay.save();
+  })
+  .then( way => res.json(way))
+  .catch(next);
+});
+
 wayRouter.get('/api/way/:id', bearerAuth, function(req, res, next) {
   debug('GET: /api/way/:id');
 
