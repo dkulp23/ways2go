@@ -4,10 +4,12 @@ const expect = require('chai').expect;
 const request = require('superagent');
 const mongoose = require('mongoose');
 const Promise = require('bluebird');
+const parseLocation = require('parse-address').parseLocation;
 
 const User = require('../model/user.js');
 const Profile = require('../model/profile.js');
 const Way = require('../model/way.js');
+const Location = require('../model/location.js');
 
 mongoose.Promise = Promise;
 
@@ -28,6 +30,9 @@ const testProfile = {
   bio: 'test bio',
   avgRating: 3,
 };
+
+const testLocation1 = '777 Seven st 77777';
+const testLocation2 = '11 eleven ave virginia beach,va 11111';
 
 const testWay = {
   startLocation: '1234 1st ave 98765',
@@ -61,8 +66,40 @@ describe('Way Routes', function() {
     .catch(done);
   });
 
+  beforeEach( done => {
+    let promLoc1 = new Location(parseLocation(testLocation1)).save()
+    .then( location1 => {
+      this.tempLocation1 = location1;
+    })
+    .catch(done);
+
+    let promLoc2 = new Location(parseLocation(testLocation2)).save()
+    .then( location2 => {
+      this.tempLocation2 = location2;
+    })
+    .catch(done);
+
+    Promise.all([ promLoc1, promLoc2 ])
+    .then( () => done())
+    .catch(done);
+  });
+
+  beforeEach( done => {
+    let tempWayObj = {
+      profileID: this.tempProfile._id,
+      startLocationID: this.tempLocation1._id,
+      endLocationID: this.tempLocation2._id
+    };
+    new Way(tempWayObj).save()
+    .then( way => {
+      this.tempWay = way;
+      done();
+    })
+    .catch(done);
+  });
+
   afterEach( done => {
-    Promise.all([ User.remove({}), Profile.remove({}), Way.remove({}) ])
+    Promise.all([ User.remove({}), Profile.remove({}), Way.remove({}), Location.remove({}) ])
     .then( () => done())
     .catch(done);
   });
@@ -73,7 +110,7 @@ describe('Way Routes', function() {
   });
 
   describe('POST: /api/way', () => {
-    describe('with a valid body', () => {
+    describe('with a valid request body', () => {
       it('should return a way', done => {
         request.post(`${url}/api/way`)
         .send(testWay)
@@ -103,6 +140,96 @@ describe('Way Routes', function() {
             done();
           })
           .catch(done);
+        });
+      });
+    });
+
+    describe('with an invalid request body: no start location provided', () => {
+      let invalidWayNoStartLocation = {
+        endLocation: '123 fake st seattle'
+      };
+      it('should respond with a 400 code', done => {
+        request.post(`${url}/api/way`)
+        .send(invalidWayNoStartLocation)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`,
+        })
+        .end((err, res) => {
+          expect(err).to.be.an('error');
+          expect(res.status).to.equal(400);
+          done();
+        });
+      });
+    });
+  });
+
+  describe('GET: /api/way/:id', () => {
+    describe('with a valid id provided', () => {
+      it('should return a way', done => {
+        request.get(`${url}/api/way/${this.tempWay._id}`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`,
+        })
+        .end((err, res) => {
+          if (err) done(err);
+          expect(res.status).to.equal(200);
+          expect(res.body._id).to.equal(this.tempWay._id.toString());
+          expect(res.body.startLocationID).to.equal(this.tempWay.startLocationID.toString());
+          expect(res.body.endLocationID).to.equal(this.tempWay.endLocationID.toString());
+          done();
+        });
+      });
+    });
+
+    describe('with an invalid id', () => {
+      it('should return a 404 code', done => {
+        request.get(`${url}/api/way/badID`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`,
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(404);
+          done();
+        });
+      });
+    });
+  });
+
+  describe('PUT: /api/way/:id', () => {
+    let updateWay = {
+      startTime: 9 * 60 + 45, //minutes
+      recurringDayOfWeek: [ 0,1,2,3,4 ]
+    };
+    describe('with a valid id and request body', () => {
+      it('should return an updated way', done => {
+        request.put(`${url}/api/way/${this.tempWay._id}`)
+        .send(updateWay)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`,
+        })
+        .end((err, res) => {
+          if (err) done(err);
+          expect(res.status).to.equal(200);
+          expect(res.body._id).to.equal(this.tempWay._id.toString());
+          expect(res.body.startTime).to.equal(updateWay.startTime);
+          expect(res.body).to.have.property('startTime');
+          done();
+        });
+      });
+    });
+  });
+
+  describe('DELETE: /api/way/:id', () => {
+    describe('with a valid id', () => {
+      it('should return a 204 code', done => {
+        request.delete(`${url}/api/way/${this.tempWay._id}`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`,
+        })
+        .end((err, res) => {
+          if (err) done(err);
+          expect(res.status).to.equal(204);
+          done();
         });
       });
     });

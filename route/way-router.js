@@ -18,10 +18,17 @@ const wayRouter = module.exports = require('express').Router();
 wayRouter.post('/api/way', bearerAuth, jsonParser, function(req, res, next) {
   debug('POST: /api/way');
 
+  if(!req.body.startLocation) return next(createError(400, 'start location required'));
+
+  if(!req.body.endLocation) return next(createError(400, 'start location required'));
+
   req.body.timestamp = new Date();
 
   let promStart = new Location(parseLocation(req.body.startLocation)).save()
-  .then( location => {req.body.startLocationID = location._id;} );
+  .then( location => {req.body.startLocationID = location._id;} )
+  .catch( err => {
+    return next(createError(400, `invalid start location: ${err.message}`));
+  });
 
   let promEnd = new Location(parseLocation(req.body.endLocation)).save()
   .then( location => {req.body.endLocationID = location._id;} );
@@ -42,4 +49,31 @@ wayRouter.post('/api/way', bearerAuth, jsonParser, function(req, res, next) {
     .then( way => res.json(way))
     .catch(next);
   });
+});
+
+wayRouter.get('/api/way/:id', bearerAuth, function(req, res, next) {
+  debug('GET: /api/way/:id');
+
+  Way.findById(req.params.id)
+  .then( way => res.json(way))
+  .catch(next);
+});
+
+wayRouter.put('/api/way/:id', bearerAuth, jsonParser, function(req, res, next) {
+  debug('PUT: /api/way/:id');
+
+  Way.findByIdAndUpdate(req.params.id, req.body, { new: true })
+  .then( way => res.json(way))
+  .catch(next);
+});
+
+wayRouter.delete('/api/way/:id', bearerAuth, function(req, res, next) {
+  debug('DELETE: /api/way/:id');
+
+  Way.findByIdAndRemove(req.params.id)
+  .then( way => {
+    console.log(way);
+    res.status(204).send(`Way ID:${way._id} Delete Successful`);
+  })
+  .catch(next);
 });
