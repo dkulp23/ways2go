@@ -19,10 +19,7 @@ wayRouter.post('/api/way', bearerAuth, jsonParser, function(req, res, next) {
   debug('POST: /api/way');
 
   if(!req.body.startLocation) return next(createError(400, 'start location required'));
-
-  if(!req.body.endLocation) return next(createError(400, 'start location required'));
-
-  req.body.timestamp = new Date();
+  if(!req.body.endLocation) return next(createError(400, 'end location required'));
 
   let promStart = new Location(parseLocation(req.body.startLocation)).save()
   .then( location => {req.body.startLocationID = location._id;} )
@@ -31,7 +28,10 @@ wayRouter.post('/api/way', bearerAuth, jsonParser, function(req, res, next) {
   });
 
   let promEnd = new Location(parseLocation(req.body.endLocation)).save()
-  .then( location => {req.body.endLocationID = location._id;} );
+  .then( location => {req.body.endLocationID = location._id;} )
+  .catch( err => {
+    return next(createError(400, `invalid end location: ${err.message}`));
+  });
 
   let promProfile = Profile.findOne({ userID: req.user._id })
   .then ( profile => {
@@ -61,6 +61,12 @@ wayRouter.get('/api/way/:id', bearerAuth, function(req, res, next) {
 
 wayRouter.put('/api/way/:id', bearerAuth, jsonParser, function(req, res, next) {
   debug('PUT: /api/way/:id');
+
+  if (Object.keys(req.body).length === 0) return next(createError(400, 'invalid request body'));
+
+  for (let prop in req.body) {
+    if (!Way.schema.paths[prop]) return next(createError(400, 'invalid request body'));
+  }
 
   Way.findByIdAndUpdate(req.params.id, req.body, { new: true })
   .then( way => res.json(way))

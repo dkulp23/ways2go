@@ -161,6 +161,24 @@ describe('Way Routes', function() {
         });
       });
     });
+
+    describe('with an invalid request body: no end location provided', () => {
+      let invalidWayNoEndLocation = {
+        endLocation: '123 fake st seattle'
+      };
+      it('should respond with a 400 code', done => {
+        request.post(`${url}/api/way`)
+        .send(invalidWayNoEndLocation)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`,
+        })
+        .end((err, res) => {
+          expect(err).to.be.an('error');
+          expect(res.status).to.equal(400);
+          done();
+        });
+      });
+    });
   });
 
   describe('GET: /api/way/:id', () => {
@@ -217,6 +235,34 @@ describe('Way Routes', function() {
         });
       });
     });
+
+    describe('with a invalid id and valid request body', () => {
+      it('should return a 404 code', done => {
+        request.put(`${url}/api/way/badID`)
+        .send(updateWay)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`,
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(404);
+          done();
+        });
+      });
+    });
+
+    describe('with a valid id and invalid request body', () => {
+      it('should return a 400 code', done => {
+        request.put(`${url}/api/way/${this.tempWay._id}`)
+        .send('bad body')
+        .set({
+          Authorization: `Bearer ${this.tempToken}`,
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(400);
+          done();
+        });
+      });
+    });
   });
 
   describe('DELETE: /api/way/:id', () => {
@@ -229,6 +275,22 @@ describe('Way Routes', function() {
         .end((err, res) => {
           if (err) done(err);
           expect(res.status).to.equal(204);
+          done();
+        });
+      });
+    });
+  });
+
+  describe('DELETE: /api/way/:id', () => {
+    describe('with an  invalid id', () => {
+      it('should return a 404 code', done => {
+        request.delete(`${url}/api/way/badID`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`,
+        })
+        .end((err, res) => {
+          expect(err).to.be.an('error');
+          expect(res.status).to.equal(404);
           done();
         });
       });
