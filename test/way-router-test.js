@@ -416,10 +416,24 @@ describe('Way Routes', function() {
       });
     });
 
-    describe('with a valid id and invalid request body', () => {
+    describe('with a valid id and invalid request body: string', () => {
       it('should return a 400 code', done => {
         request.put(`${url}/api/way/${this.tempWay._id}`)
         .send('bad body')
+        .set({
+          Authorization: `Bearer ${this.tempToken}`,
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(400);
+          done();
+        });
+      });
+    });
+
+    describe('with a valid id and invalid request body: object with a property not defined in Way model', () => {
+      it('should return a 400 code', done => {
+        request.put(`${url}/api/way/${this.tempWay._id}`)
+        .send({ bad: 'property'})
         .set({
           Authorization: `Bearer ${this.tempToken}`,
         })
