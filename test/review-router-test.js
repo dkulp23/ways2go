@@ -37,10 +37,10 @@ const mocProfile = {
   avgRating: 3
 };
 
-const mocWay = {
-  startLocationID: '1234 1st ave 98765',
-  endLocationID: '432 moc st seattle, wa 56789'
-};
+// const mocWay = {
+//   startLocationID: '1234 1st ave 98765',
+//   endLocationID: '432 moc st seattle, wa 56789'
+// };
 
 const mocLocation1 = '777 Seven st 77777';
 const mocLocation2 = '11 eleven ave virginia beach,va 11111';

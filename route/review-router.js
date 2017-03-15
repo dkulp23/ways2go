@@ -21,24 +21,9 @@ reviewRouter.post('/api/wayerz/:wayerzID/review', bearerAuth, jsonParser, functi
   .catch(next);
 });
 
-reviewRouter.get('/api/wayerz/:wayerzID/review', bearerAuth, function(req, res, next) {
-  debug('GET: /api/wayerz/:wayerzID/review');
-
-  if (!req.params.wayerzID) return next(createError(404, 'not found'));
-  Profile.findById(req.params.wayerzID)
-  .populate('reviews')
-  .then( profile => {
-    res.json(profile.reviews);
-  })
-  .catch(next);
-});
-
 reviewRouter.put('/api/review/:id', bearerAuth, jsonParser, function(req, res, next) {
   debug('PUT: /api/review/:id');
 
-  if(!req.body) {
-    return next(createError(400, 'invalid body'));
-  }
   Review.findById(req.params.id)
   .then( review => {
     if (review.userID.toString() !== req.user._id.toString()) {
@@ -54,6 +39,19 @@ reviewRouter.put('/api/review/:id', bearerAuth, jsonParser, function(req, res, n
     next(createError(404, err.message));
   });
 });
+
+reviewRouter.get('/api/wayerz/:wayerzID/review', bearerAuth, function(req, res, next) {
+  debug('GET: /api/wayerz/:wayerzID/review');
+
+  if (!req.params.wayerzID) return next(createError(404, 'not found'));
+  Profile.findById(req.params.wayerzID)
+  .populate('reviews')
+  .then( profile => {
+    res.json(profile.reviews);
+  })
+  .catch(next);
+});
+
 
 reviewRouter.delete('/api/review/:id', bearerAuth, function(req, res, next) {
   debug('DELETE: /api/review/:id');

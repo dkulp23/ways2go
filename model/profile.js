@@ -2,6 +2,7 @@
 
 const debug = require('debug')('ways2go:profile');
 const mongoose = require('mongoose');
+const createError = require('http-errors');
 const Schema = mongoose.Schema;
 
 const Review = require('../model/review.js');
