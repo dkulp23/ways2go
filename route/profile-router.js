@@ -45,14 +45,7 @@ profileRouter.get('/api/profile', bearerAuth, function(req, res, next) {
 profileRouter.put('/api/profile', bearerAuth, jsonParser, function(req, res, next) {
   debug('PUT: /api/profile');
 
-  Profile.findOne({ userID: req.user._id })
-  .then( profile => {
-    if (!profile) return next(createError(404, 'profile not found'));
-    if (profile.userID.toString() !== req.user._id.toString()) {
-      return next(createError(401, 'unauthorized user'));
-    }
-    return Profile.findOneAndUpdate({ userID: profile.userID }, req.body, { new: true });
-  })
+  Profile.findOneAndUpdate({ userID: req.user._id }, req.body, { new: true })
   .then( profile => {
     let reqKeys = Object.keys(req.body);
     if (!profile[reqKeys]) return next(createError(400, 'bad request'));
@@ -64,14 +57,7 @@ profileRouter.put('/api/profile', bearerAuth, jsonParser, function(req, res, nex
 profileRouter.delete('/api/profile', bearerAuth, function(req, res, next) {
   debug('DELETE: /api/profile');
 
-  Profile.findOne({ userID: req.user._id })
-  .then( profile => {
-    if (!profile) return next(createError(404, 'profile not found'));
-    if (profile.userID.toString() !== req.user._id.toString()) {
-      return next(createError(401, 'unauthorized user'));
-    }
-    return Profile.findByIdAndRemove(profile._id);
-  })
+  Profile.findOneAndRemove({ userID: req.user._id })
   .then( deleted => {
     if (!deleted) return next(createError(404, 'profile not found'));
     return next(res.status(204).send('profile deleted'));
