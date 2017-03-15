@@ -10,8 +10,8 @@ const bearerAuth = require('../lib/bearer-auth-middleware.js');
 
 const reviewRouter = module.exports = Router();
 
-reviewRouter.post('/api/way/:wayid/wayerz/review', bearerAuth, jsonParser, function(req, res, next) {
-  debug('POST: /api/way/:wayid/wayerz/review');
+reviewRouter.post('/api/way/:wayid/wayerz/:wayerzID/review', bearerAuth, jsonParser, function(req, res, next) {
+  debug('POST: /api/way/:wayid/wayerz/:wayerzID/review');
 
   req.body.userID = req.user._id;
   new Review(req.body).save()
@@ -23,7 +23,7 @@ reviewRouter.get('/api/review', bearerAuth, function(req, res, next) {
   debug('GET: /api/review');
 
   if (!req.params.id) return next(createError(404, 'not found'));
-  ReviewfindById(req.params.id)
+  Review.findById(req.params.id)
   .then( review => {
     if (review.userID.toString() !== req.user._id.toString()) {
       return next(createError(401, 'invalid user'));
@@ -48,7 +48,7 @@ reviewRouter.put('/api/review/:id', bearerAuth, jsonParser, function(req, res, n
     review.comment = req.body.comment;
     return review.save();
   })
-  .then( review => re.json(review))
+  .then( review => res.json(review))
   .catch( err => {
     if (err.name === 'ValidationError') return next(err);
     next(createError(404, err.message));
@@ -69,7 +69,7 @@ reviewRouter.get('/api/way/:wayid/wayerz/:wayerzid/review', bearerAuth, function
   if (!req.params.id) return next(createError(404, 'not found'));
   Review.findById(req.params.id)
   .then( review => {
-    if (gallery.userID.toString() !== req.user._id.toString()) {
+    if (review.userID.toString() !== req.user._id.toString()) {
       return next(createError(401, 'invalid user'));
     }
     res.json(review);
