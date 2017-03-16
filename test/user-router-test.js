@@ -18,6 +18,12 @@ const testUser = {
   email: 'test@email.com',
 };
 
+const otherUser = {
+  username: 'anotheruser',
+  password: 'notpassword',
+  email: 'testing@email.com'
+};
+
 describe('User Routes', function() {
   afterEach( done => {
     User.remove({})
@@ -168,6 +174,21 @@ describe('User Routes', function() {
       })
       .then( token => {
         this.tempToken = token;
+        done();
+      })
+      .catch(done);
+    });
+
+    beforeEach( done => {
+      let user = new User(otherUser);
+      user.generatePasswordHash(otherUser.password)
+      .then( user => user.save())
+      .then( user => {
+        this.tempUser2 = user;
+        return user.generateToken();
+      })
+      .then( token => {
+        this.tempToken2 = token;
         done();
       })
       .catch(done);

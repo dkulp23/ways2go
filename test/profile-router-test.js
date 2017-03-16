@@ -7,6 +7,7 @@ const Promise = require('bluebird');
 
 const User = require('../model/user.js');
 const Profile = require('../model/profile.js');
+const Message = require('../model/message.js');
 
 mongoose.Promise = Promise;
 
@@ -38,6 +39,11 @@ const otherProfile = {
   fullName: 'Ms. Test User',
   address: '2901 3rd Ave, Seattle, WA 98121',
   bio: 'I am a human person.'
+};
+
+const testMessage = {
+  username: 'tester name',
+  text: 'this is a test message'
 };
 
 describe('Profile Routes', function() {
@@ -290,8 +296,49 @@ describe('Profile Routes', function() {
       .catch(done);
     });
 
-    afterEach( () => {
+    beforeEach( done => {
+      let user = new User(otherUser);
+      user.generatePasswordHash(otherUser.password)
+      .then( user => user.save())
+      .then( user => {
+        this.tempUserTwo = user;
+        return user.generateToken();
+      })
+      .then( token => {
+        this.tempTokenTwo = token;
+        done();
+      })
+      .catch(done);
+    });
+
+    beforeEach( done => {
+      otherProfile.userID = this.tempUser._id.toString();
+      new Profile(otherProfile).save()
+      .then( profile => {
+        this.tempProfileTwo = profile;
+        done();
+      })
+      .catch(done);
+    });
+
+    beforeEach( done => {
+      testMessage.from_user_id = this.tempProfile;
+      testMessage.to_user_id = this.tempProfileTwo;
+      new Message(testMessage).save()
+      .then( message => {
+        this.tempMessage = message;
+        console.log('message', message);
+        done();
+      })
+      .catch(done);
+    });
+
+    afterEach( done => {
       delete testProfile.userID;
+      delete otherProfile.userID;
+      Message.remove({})
+      .then( () => done())
+      .catch(done);
     });
 
     describe('with a valid request', () => {
@@ -303,6 +350,10 @@ describe('Profile Routes', function() {
         .end((err, res) => {
           if (err) return done(err);
           expect(res.status).to.equal(204);
+          Message.findOne({ to_user_id: this.tempProfile._id }, (err, msg) => {
+            if (err) return done(err);
+            expect(msg).to.be.null;
+          });
           done();
         });
       });
@@ -373,9 +424,6 @@ describe('Profile Routes', function() {
 
     afterEach( () => {
       delete testProfile.userID;
-    });
-
-    afterEach( () => {
       delete otherProfile.userID;
     });
 
