@@ -8,7 +8,159 @@
   <body>
     <h1 id="ways2go">ways2go</h1>
 
-    <p>Social networking rideshare solution for your daily commute.</p>
+<p>Social networking rideshare solution for your daily commute.</p>
 
+<hr />
+
+<h1 id="models"><strong>MODELS</strong></h1>
+
+<hr />
+
+<h3 id="_user_"><em>User</em></h3>
+
+<p>This is the entry point for the ways2go interface. In order to interact with most of the features, each individual will be asked to provide a unique <code>username</code>, <code>password</code> and <code>email</code> address. This information will be stored securely and used to verify individuals each time they visit the site. ways2go leverages the <a href="https://github.com/kelektiv/node.bcrypt.js">bcrypt</a> module to safely encrypt and match user passwords.</p>
+
+<pre><code>{
+    username: "cool_commuter",
+    password: "&lt;super salty bcrypt password string&gt;",
+    email: "ray_tomlinson@arpa.net",
+    timeStamp: "&lt;default to document when account was created&gt;",
+    _id: "&lt;supplied by MongoDB when document is created&gt;"
+}
+</code></pre>
+
+<h3 id="_profile_"><em>Profile</em></h3>
+
+<p>This will be the customizable home base for each individual user. The Profile <code>._id</code> provided by <a href="https://docs.mongodb.com/manual/core/document/">Mongodb</a> will serve as the tether that loosely binds the individual to their Ways, Messages and Reviews.</p>
+
+<pre><code>{
+    userID: "&lt;will be populated with user._id when document is created&gt;",
+    displayName: "Rollin with my Homies",
+    fullName: " ",
+    address: " ",
+    bio: " ",
+    avgRating: " ",
+    timeStamp: " ",
+    reviews: [{&lt;array of MongoDB IDs with&gt;}]
+}
+</code></pre>
+
+<hr />
+
+<h1 id="routes">ROUTES</h1>
+
+<hr />
+
+<h3 id="post_apiuser_"><strong>POST:</strong>  <em>/api/user</em></h3>
+
+<p>This is the endpoint to hit to sign up a new user.</p>
+
+<h5 id="request">Request</h5>
+
+<p>There are three required components to the request that every user must provide in order to create an account:</p>
+
+<ul>
+<li>username</li>
+
+<li>password</li>
+
+<li>email</li>
+</ul>
+
+<p>The request should be made in JSON format:</p>
+
+<pre><code>{ "username": "helloworld", "password": "notpassword", "email": "valid@email.com" }
+</code></pre>
+
+<h5 id="response">Response</h5>
+
+<p>The response object <em>(res.text)</em> will contain a randomly generated 32 byte string that will serve as the new user's token for signing in to create a profile.
+Example</p>
+
+<pre><code>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbiI6IjVhNTFiZmI1YTlkYzJjYzY0MGRkODljODIwZjZkZWZjY2RiMGNmOTc2NGI4YjZkYTUwNDk4NzljOGNjOWZmNDIiLCJpYXQiOjE0ODk1OTIzMjB9.vfM9xh4iFZFOU_aFpWz_z4SbTAwjbAkuRCgnyyhgnEk
+</code></pre>
+
+<h3 id="get_apiuser_"><strong>GET:</strong> <em>/api/user</em></h3>
+
+<p>This is the endpoint to hit for a user to sign in.
+User will be asked to enter <code>username</code> and <code>password</code>.
+ways2go uses the bcrypt npm module to create and verify encypted passwords.</p>
+
+<h5 id="request-1">Request</h5>
+
+<p>Authorization Header: <code>req.headers.authorization</code>
+Format: <code>username:password</code></p>
+
+<h5 id="response-1">Response</h5>
+
+<p><code>res.text</code> will contain the authentication token that will allow the user to create or access their profile and all other routes.
+<strong>Token:</strong></p>
+
+<pre><code>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbiI6IjVhNTFiZmI1YTlkYzJjYzY0MGRkODljODIwZjZkZWZjY2RiMGNmOTc2NGI4YjZkYTUwNDk4NzljOGNjOWZmNDIiLCJpYXQiOjE0ODk1OTIzMjB9.vfM9xh4iFZFOU_aFpWz_z4SbTAwjbAkuRCgnyyhgnEk
+</code></pre>
+
+<h3 id="put_apiuser_"><strong>PUT:</strong> <em>/api/user</em></h3>
+
+<p>This endpoint will allow users to update their <code>username</code> or <code>password</code>.</p>
+
+<h5 id="request-2">Request</h5>
+
+<p>User must be signed in and provide token in <code>Authorization Header</code>
+<code>'Bearer &lt;token&gt;'</code> <em>(single space between fields required</em>
+The property to be updated should be sent in JSON format within the <code>req.body</code>.
+<code>{ "password": "newpassword" }</code></p>
+
+<h5 id="response-2">Response</h5>
+
+<p>The <code>res.text</code> property of the response object will contain a status code and message. If successful:</p>
+
+<pre><code class="sh language-sh">201
+password updated successfully
+</code></pre>
+
+<h3 id="delete_apiuser_"><strong>DELETE</strong> <em>/api/user</em></h3>
+
+<p>This endpoint will allow a user to remove their account.</p>
+
+<h5 id="request-3">Request</h5>
+
+<p>User must be signed in and provide token in <code>Authorization Header</code> to access this route.
+<code>'Bearer &lt;token&gt;'</code> <em>(single space between fields required</em></p>
+
+<h5 id="response-3">Response</h5>
+
+<p>Upon success:
+<code>res.status</code> => 200
+<code>res.text</code> => account removed</p>
+
+<h3 id="post_apiprofile_"><strong>POST</strong> <em>/api/profile</em></h3>
+
+<h5 id="request-4"><em>Request</em></h5>
+
+<h5 id="response-4">Response</h5>
+
+<h3 id="getapiprofileid">GET /api/profile/:id</h3>
+
+<h5 id="request-5">Request</h5>
+
+<h5 id="response-5">Response</h5>
+
+<h3 id="getapiprofile">GET /api/profile</h3>
+
+<h5 id="request-6">Request</h5>
+
+<h5 id="response-6">Response</h5>
+
+<h3 id="putapiprofile">PUT /api/profile</h3>
+
+<h5 id="request-7">Request</h5>
+
+<h5 id="response-7">Response</h5>
+
+<h3 id="deleteapiprofile">DELETE /api/profile</h3>
+
+<h5 id="request-8">Request</h5>
+
+<h5 id="response-8">Response</h5>
   </body>
 </html>
