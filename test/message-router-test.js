@@ -6,7 +6,7 @@ const Promise = require('bluebird');
 
 const User = require('../model/user.js');
 const Profile = require('../model/profile.js');
-const Message = require('../model/message.js');
+// const Message = require('../model/message.js');
 const Way = require('../model/way.js');
 
 
