@@ -45,7 +45,7 @@ userRouter.put('/api/user', bearerAuth, jsonParser, function(req, res, next) {
   .then( user => {
     let reqKeys = Object.keys(req.body);
     if (!user[reqKeys]) return next(createError(400, 'bad request'));
-    res.json(user);
+    return next(res.status(201).send(`${reqKeys} updated successfully`));
   })
   .catch(next);
 });

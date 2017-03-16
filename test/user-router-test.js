@@ -203,8 +203,8 @@ describe('User Routes', function() {
         })
         .end((err, res) => {
           if (err) return done(err);
-          expect(res.status).to.equal(200);
-          expect(res.body.email).to.equal('new@email.com');
+          expect(res.status).to.equal(201);
+          expect(res.text).to.equal('email updated successfully');
           done();
         });
       });
