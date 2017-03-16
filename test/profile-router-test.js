@@ -326,7 +326,6 @@ describe('Profile Routes', function() {
       new Message(testMessage).save()
       .then( message => {
         this.tempMessage = message;
-        console.log('message', message);
         done();
       })
       .catch(done);

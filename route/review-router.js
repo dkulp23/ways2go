@@ -33,7 +33,7 @@ reviewRouter.put('/api/review/:id', bearerAuth, jsonParser, function(req, res, n
   .then( review => res.json(review))
   .catch(next);
 });
- 
+
 reviewRouter.get('/api/wayerz/:wayerzID/review', bearerAuth, function(req, res, next) {
   debug('GET: /api/wayerz/:wayerzID/review');
 
@@ -43,7 +43,6 @@ reviewRouter.get('/api/wayerz/:wayerzID/review', bearerAuth, function(req, res, 
     res.json(profile.reviews);
   })
   .catch(next);
-});
 
 reviewRouter.delete('/api/review/:id', bearerAuth, function(req, res, next) {
   debug('DELETE: /api/review/:id');

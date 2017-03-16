@@ -63,10 +63,8 @@ wayRouter.post('/api/way/:wayID/wayerz/:wayerID', bearerAuth, function(req, res,
   })
   .then( profile => {
     if (profile._id.toString() !== tempWay.profileID.toString()) return next(createError(401, 'not owner of way'));
-    console.log('before',tempWay.wayerz);
 
     tempWay.wayerz.push(tempWayerProfile._id);
-    console.log('after',tempWay.wayerz);
     return tempWay.save();
   })
   .then( way => res.json(way))
@@ -89,10 +87,8 @@ wayRouter.delete('/api/way/:wayID/wayerz/:wayerID', bearerAuth, function(req, re
   })
   .then( profile => {
     if (profile._id.toString() !== tempWay.profileID.toString()) return next(createError(401, 'not owner of way'));
-    console.log('before',tempWay.wayerz);
 
     tempWay.wayerz.splice(tempWay.wayerz.indexOf(tempWayerProfile._id), 1);
-    console.log('after',tempWay.wayerz);
     return tempWay.save();
   })
   .then( way => res.json(way))
@@ -139,7 +135,6 @@ wayRouter.delete('/api/way/:id', bearerAuth, function(req, res, next) {
 
   Way.findByIdAndRemove(req.params.id)
   .then( way => {
-    console.log(way);
     res.status(204).send(`Way ID:${way._id} Delete Successful`);
   })
   .catch(next);
