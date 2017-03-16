@@ -107,15 +107,8 @@ wayRouter.get('/api/way/:id', bearerAuth, function(req, res, next) {
   .catch(next);
 });
 
-wayRouter.get('/api/way', bearerAuth, function(req, res, next) {
+wayRouter.get('/api/way', function(req, res, next) {
   debug('GET: /api/way');
-
-  // Profile.findOne({ userID: req.user._id.toString()} )
-  // .then( profile => {
-  //   return Way.find({ profileID: profile._id });
-  // })
-  // .then( ways => res.json(ways))
-  // .catch(next);
 
   Way.find({})
   .then( ways => res.json(ways))
