@@ -22,4 +22,15 @@ describe('API Root Routes', function() {
       });
     });
   });
+
+  describe('GET: /api/developer', () => {
+    it('should return the developer.html', done => {
+      request.get(`${url}/api/developer`)
+      .end((err, res) => {
+        expect(res.status).to.equal(200);
+        expect(res.headers['content-type']).to.equal('text/html; charset=UTF-8');
+        done();
+      });
+    });
+  });
 });
