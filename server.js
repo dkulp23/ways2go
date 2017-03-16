@@ -11,6 +11,7 @@ const mongoose = require('mongoose');
 const wayRouter = require('./route/way-router.js');
 const userRouter = require('./route/user-router.js');
 const profileRouter = require('./route/profile-router.js');
+const messageRouter = require('./route/message-router.js');
 const reviewRouter = require('./route/review-router.js');
 
 const errors = require('./lib/error-middleware.js');
@@ -29,6 +30,7 @@ app.use(userRouter);
 app.use(wayRouter);
 app.use(profileRouter);
 app.use(reviewRouter);
+app.use(messageRouter);
 app.use(errors);
 
 const server = module.exports = app.listen(PORT, () => {

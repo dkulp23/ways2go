@@ -42,7 +42,6 @@ const otherProfile = {
 };
 
 const testMessage = {
-  username: 'tester name',
   text: 'this is a test message'
 };
 
@@ -322,8 +321,8 @@ describe('Profile Routes', function() {
     });
 
     beforeEach( done => {
-      testMessage.from_user_id = this.tempProfile;
-      testMessage.to_user_id = this.tempProfileTwo;
+      testMessage.fromProfileID = this.tempProfile;
+      testMessage.toProfileID = this.tempProfileTwo;
       new Message(testMessage).save()
       .then( message => {
         this.tempMessage = message;
