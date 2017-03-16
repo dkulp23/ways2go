@@ -57,7 +57,7 @@ describe('App Utilities', function() {
   describe('Bearer Auth', () => {
     describe('request with no auth header', () => {
       it('should respond with a 401 code', done => {
-        request.get(`${url}/api/way`)
+        request.get(`${url}/api/profile/fakeID`)
         .end((err, res) => {
           expect(res.status).to.equal(401);
           done();
@@ -67,7 +67,7 @@ describe('App Utilities', function() {
 
     describe('request with no token', () => {
       it('should respond with a 401 code', done => {
-        request.get(`${url}/api/way`)
+        request.get(`${url}/api/profile/fakeID`)
         .set({
           Authorization: {bad: 'auth'}
         })
@@ -83,7 +83,7 @@ describe('App Utilities', function() {
   describe('Basic Auth', () => {
     describe('request with no auth header', () => {
       it('should respond with a 401 code', done => {
-        request.get(`${url}/api/user`)
+        request.get(`${url}/api/signin`)
         .set({
           Authorization: { bad: 'basic auth'}
         })
