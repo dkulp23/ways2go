@@ -53,6 +53,12 @@ messageRouter.get('/api/message/:id', bearerAuth, jsonParser, function(req, res,
   messageRouter.put('/api/message/:id', bearerAuth, jsonParser, function(req, res, next) {
     debug('PUT: /api/message/:id');
 
+    if (Object.keys(req.body).length === 0) return next(createError(440, 'Invalid Request Body'));
+
+    for (let prop in req.body) {
+      if (!Message.schema.paths[prop]) return next(createError(400, 'Invalid Request Body'));
+    }
+
     let tempProfile;
 
     Profile.findOne({userID:req.user._id })
@@ -69,7 +75,11 @@ messageRouter.get('/api/message/:id', bearerAuth, jsonParser, function(req, res,
 .then( message => {
   return Message.findByIdAndUpdate(message._id, req.body, { new:true });
 })
-.then( message => res.json(message))
+.then( message => {
+  console.log('message*******************>>', message);
+  res.json(message);
+
+})
 .catch(next);
   });
 
@@ -96,6 +106,8 @@ messageRouter.get('/api/message/:id', bearerAuth, jsonParser, function(req, res,
 .then( () => res.send(204))
 .catch(next);
   });
+
+
 
 //end
 });
