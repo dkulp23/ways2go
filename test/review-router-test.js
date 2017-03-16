@@ -170,6 +170,23 @@ describe('Review Routes', function() {
         .catch(done);
       });
     });
+
+    it('should send a 400 status, bad request', done => {
+
+      request.post(`${url}/api/wayerz/${this.tempProfile._id}/review`)
+
+      .send('badmockreview')
+      .set({
+        Authorization: `Bearer ${this.tempToken}`,
+      })
+      .end((err, res) => {
+        expect(err).to.be.an('error');
+        expect(res.status).to.equal(400);
+        done();
+      });
+    });
+
+
   });
 
   describe('GET: /api/wayerz/:wayerzID/review', () => {
@@ -208,9 +225,8 @@ describe('Review Routes', function() {
   });
 
   describe('DELETE /api/review/:id', () => {
-    console.log('in describe---->');
+
     it('should successfully delete a review', done => {
-      console.log('in it block----->');
       request.delete(`${url}/api/review/${this.tempReview._id}`)
       .set({
         Authorization: `Bearer ${this.tempToken}`,
