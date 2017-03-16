@@ -24,6 +24,7 @@ profileRouter.get('/api/profile/:id', bearerAuth, function(req, res, next) {
   debug('GET: /api/profile/:id');
 
   Profile.findById(req.params.id)
+  .populate('reviews')
   .then( profile => {
     if (!profile) return next(createError(404, 'Profile Not Found'));
     res.json(profile);
