@@ -52,13 +52,3 @@ reviewRouter.delete('/api/review/:id', bearerAuth, function(req, res, next) {
   .then( () => res.status(204).send())
   .catch(next);
 });
-
-reviewRouter.get('/api/wayerz/:wayerzID/review', bearerAuth, function(req, res, next) {
-  debug('GET: /api/wayerz/:wayerzID/review');
-
-  Review.findById(req.params.id)
-  .then( review => {
-    res.json(review);
-  })
-  .catch(next);
-});
