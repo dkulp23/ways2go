@@ -31,10 +31,7 @@ reviewRouter.put('/api/review/:id', bearerAuth, jsonParser, function(req, res, n
     return review.save();
   })
   .then( review => res.json(review))
-  .catch( err => {
-    if (err.name === 'ValidationError') return next(err);
-    next(createError(404, err.message));
-  });
+  .catch(next);
 });
 
 reviewRouter.get('/api/wayerz/:wayerzID/review', bearerAuth, function(req, res, next) {
@@ -55,18 +52,14 @@ reviewRouter.delete('/api/review/:id', bearerAuth, function(req, res, next) {
 
   Review.findByIdAndRemove(req.params._id)
   .then( () => res.status(204).send())
-  .catch( err => next(createError(404, err.message)));
+  .catch(next);
 });
 
 reviewRouter.get('/api/wayerz/:wayerzid/review', bearerAuth, function(req, res, next) {
   debug('GET: /api/wayerz/:wayerzid/review');
 
-  if (!req.params.id) return next(createError(404, 'not found'));
   Review.findById(req.params.id)
   .then( review => {
-    if (review.userID.toString() !== req.user._id.toString()) {
-      return next(createError(401, 'invalid user'));
-    }
     res.json(review);
   })
   .catch(next);
