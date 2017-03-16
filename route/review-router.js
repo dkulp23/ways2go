@@ -2,7 +2,7 @@
 
 const Router = require('express').Router;
 const jsonParser = require('body-parser').json();
-const createError = require('http-errors');
+// const createError = require('http-errors');
 const debug = require('debug')('ways2go*:review-router');
 
 const Review = require('../model/review.js');
@@ -37,7 +37,6 @@ reviewRouter.put('/api/review/:id', bearerAuth, jsonParser, function(req, res, n
 reviewRouter.get('/api/wayerz/:wayerzID/review', bearerAuth, function(req, res, next) {
   debug('GET: /api/wayerz/:wayerzID/review');
 
-  if (!req.params.wayerzID) return next(createError(404, 'not found'));
   Profile.findById(req.params.wayerzID)
   .populate('reviews')
   .then( profile => {
@@ -45,7 +44,6 @@ reviewRouter.get('/api/wayerz/:wayerzID/review', bearerAuth, function(req, res, 
   })
   .catch(next);
 });
-
 
 reviewRouter.delete('/api/review/:id', bearerAuth, function(req, res, next) {
   debug('DELETE: /api/review/:id');
@@ -55,8 +53,8 @@ reviewRouter.delete('/api/review/:id', bearerAuth, function(req, res, next) {
   .catch(next);
 });
 
-reviewRouter.get('/api/wayerz/:wayerzid/review', bearerAuth, function(req, res, next) {
-  debug('GET: /api/wayerz/:wayerzid/review');
+reviewRouter.get('/api/wayerz/:wayerzID/review', bearerAuth, function(req, res, next) {
+  debug('GET: /api/wayerz/:wayerzID/review');
 
   Review.findById(req.params.id)
   .then( review => {
