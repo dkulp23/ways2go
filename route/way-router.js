@@ -99,7 +99,7 @@ wayRouter.delete('/api/way/:wayID/wayerz/:wayerID', bearerAuth, function(req, re
   .catch(next);
 });
 
-wayRouter.get('/api/way/:id', bearerAuth, function(req, res, next) {
+wayRouter.get('/api/way/:id', function(req, res, next) {
   debug('GET: /api/way/:id');
 
   Way.findById(req.params.id)
@@ -110,19 +110,6 @@ wayRouter.get('/api/way/:id', bearerAuth, function(req, res, next) {
     res.json(way);
   })
   .catch(next);
-  // Way.findById(req.params.id)
-  // .then( way => {
-  //   console.log('way 1', way);
-  //   return way
-  //   .populate('startLocationID')
-  //   .populate('endLocationID')
-  //   .populate('wayerz');
-  // })
-  // .then( way => {
-  //   console.log('way 2', way);
-  //   res.json(way);
-  // })
-  // .catch(next);
 });
 
 wayRouter.get('/api/way', function(req, res, next) {
