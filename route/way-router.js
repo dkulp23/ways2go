@@ -23,15 +23,11 @@ wayRouter.post('/api/way', bearerAuth, jsonParser, function(req, res, next) {
 
   let promStart = new Location(parseLocation(req.body.startLocation)).save()
   .then( location => {req.body.startLocationID = location._id;} )
-  .catch( err => {
-    return next(createError(400, `invalid start location: ${err.message}`));
-  });
+  .catch(next);
 
   let promEnd = new Location(parseLocation(req.body.endLocation)).save()
   .then( location => {req.body.endLocationID = location._id;} )
-  .catch( err => {
-    return next(createError(400, `invalid end location: ${err.message}`));
-  });
+  .catch(next);
 
   let promProfile = Profile.findOne({ userID: req.user._id })
   .then ( profile => {
