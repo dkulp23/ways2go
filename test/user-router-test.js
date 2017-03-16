@@ -31,10 +31,10 @@ describe('User Routes', function() {
     .catch(done);
   });
 
-  describe('POST: /api/user', function() {
+  describe('POST: /api/signup', function() {
     describe('with a valid request body', () => {
       it('should return a token', done => {
-        request.post(`${url}/api/user`)
+        request.post(`${url}/api/signup`)
         .send(testUser)
         .end((err, res) => {
           if (err) return done(err);
@@ -47,7 +47,7 @@ describe('User Routes', function() {
 
     describe('without a request body', () => {
       it('should return a 400 error', done => {
-        request.post(`${url}/api/user`)
+        request.post(`${url}/api/signup`)
         .end((err, res) => {
           console.log('res', res.text);
           expect(err.status).to.equal(400);
@@ -59,7 +59,7 @@ describe('User Routes', function() {
 
     describe('with an invalid email', () => {
       it('should return a 400 error', done => {
-        request.post(`${url}/api/user`)
+        request.post(`${url}/api/signup`)
         .send({
           username: 'test',
           password: 'checkit',
@@ -74,7 +74,7 @@ describe('User Routes', function() {
     });
   });
 
-  describe('GET: /api/user', function() {
+  describe('GET: /api/signin', function() {
     beforeEach( done => {
       let user = new User(testUser);
       user.generatePasswordHash(user.password)
@@ -88,7 +88,7 @@ describe('User Routes', function() {
 
     describe('with valid request', () => {
       it('should return a token', done => {
-        request.get(`${url}/api/user`)
+        request.get(`${url}/api/signin`)
         .auth('tester name', 'password')
         .end((err, res) => {
           if (err) return done(err);
@@ -101,7 +101,7 @@ describe('User Routes', function() {
 
     describe('without a request body', () => {
       it('should return a 401 error', done => {
-        request.get(`${url}/api/user`)
+        request.get(`${url}/api/signin`)
         .end((err, res) => {
           expect(err.status).to.equal(401);
           expect(res.text).to.equal('UnauthorizedError');
@@ -112,7 +112,7 @@ describe('User Routes', function() {
 
     describe('without a username', () => {
       it('should return a 401 error', done => {
-        request.get(`${url}/api/user`)
+        request.get(`${url}/api/signin`)
         .auth('', 'password')
         .end((err, res) => {
           expect(err.status).to.equal(401);
@@ -125,7 +125,7 @@ describe('User Routes', function() {
 
     describe('without a password', () => {
       it('should return a 401 error', done => {
-        request.get(`${url}/api/user`)
+        request.get(`${url}/api/signin`)
         .auth('tester name', '')
         .end((err, res) => {
           expect(err.status).to.equal(401);
@@ -138,7 +138,7 @@ describe('User Routes', function() {
 
     describe('with an unrecognized user', () => {
       it('should return a 404 error', done => {
-        request.get(`${url}/api/user`)
+        request.get(`${url}/api/signin`)
         .auth('not the name', 'password')
         .end((err, res) => {
           expect(err.status).to.equal(404);
@@ -151,7 +151,7 @@ describe('User Routes', function() {
 
     describe('with an incorrect password', () => {
       it('should return a 401 error', done => {
-        request.get(`${url}/api/user`)
+        request.get(`${url}/api/signin`)
         .auth('tester name', 'wrong')
         .end((err, res) => {
           console.log('err', err.message);
@@ -203,8 +203,8 @@ describe('User Routes', function() {
         })
         .end((err, res) => {
           if (err) return done(err);
-          expect(res.status).to.equal(200);
-          expect(res.body.email).to.equal('new@email.com');
+          expect(res.status).to.equal(201);
+          expect(res.text).to.equal('email updated successfully');
           done();
         });
       });

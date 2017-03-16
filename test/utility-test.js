@@ -83,7 +83,7 @@ describe('App Utilities', function() {
   describe('Basic Auth', () => {
     describe('request with no auth header', () => {
       it('should respond with a 401 code', done => {
-        request.get(`${url}/api/user`)
+        request.get(`${url}/api/signin`)
         .set({
           Authorization: { bad: 'basic auth'}
         })
