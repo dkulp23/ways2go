@@ -6,6 +6,7 @@ const morgan = require('morgan');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
+const Promise = require('bluebird');
 
 const apiRouter = require('./route/api-router.js');
 const wayRouter = require('./route/way-router.js');
@@ -21,6 +22,7 @@ dotenv.load();
 const PORT = process.env.PORT || 3000;
 const app = express();
 
+mongoose.Promise = Promise;
 mongoose.connect(process.env.MONGODB_URI);
 
 app.use(cors());
