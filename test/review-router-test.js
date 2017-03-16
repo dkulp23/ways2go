@@ -129,7 +129,8 @@ describe('Review Routes', function() {
     mocReview.wayID = this.tempWay._id;
     Profile.findByIdAndAddReview(this.tempProfile._id, mocReview)
     .then( review => {
-      this.mocReview = review;
+      console.log('in review block', review);
+      this.tempReview = review;
       done();
     })
     .catch(done);
@@ -146,12 +147,12 @@ describe('Review Routes', function() {
     .catch(done);
   });
 
-  describe('POST: /api/wayerz/:wayerzID/review', function() {
-    it('should return a review', done => {
-      request.post(`${url}/api/wayerz/${this.parent.tempProfile._id}/review`)
+  describe('POST: /api/wayerz/:wayerzID/review', () => {
+    it('should send a valid review', done => {
+      request.post(`${url}/api/wayerz/${this.tempProfile._id}/review`)
       .send(mocReview)
       .set({
-        Authorization: `Bearer ${this.parent.tempToken}`,
+        Authorization: `Bearer ${this.tempToken}`,
       })
       .end((err, res) => {
         if (err) return done(err);
@@ -171,11 +172,11 @@ describe('Review Routes', function() {
     });
   });
 
-  describe('GET: /api/wayerz/:wayerzID/review', function() {
-    it('should return a review', done => {
-      request.get(`${url}/api/wayerz/${this.parent.tempProfile._id}/review`)
+  describe('GET: /api/wayerz/:wayerzID/review', () => {
+    it('should return a valid review', done => {
+      request.get(`${url}/api/wayerz/${this.tempProfile._id}/review`)
       .set({
-        Authorization: `Bearer ${this.parent.tempToken}`,
+        Authorization: `Bearer ${this.tempToken}`,
       })
       .end((err, res) => {
         if (err) return done(err);
@@ -183,6 +184,40 @@ describe('Review Routes', function() {
         expect(res.body.length).to.equal(1);
         expect(res.body[0].rating).to.equal(mocReview.rating);
         expect(res.body[0].comment).to.equal(mocReview.comment);
+        done();
+      });
+    });
+  });
+
+  describe('PUT /api/review/:id', () => {
+
+    it('should successfully edit a review', done => {
+      var updated = { rating: 4 };
+      request.put(`${url}/api/review/${this.tempReview._id}`)
+      .send(updated)
+      .set({
+        Authorization: `Bearer ${this.tempToken}`,
+      })
+      .end((err, res) => {
+        if (err) return done(err);
+        expect(res.status).to.equal(200);
+        expect(res.body.rating).to.equal(updated.rating);
+        done();
+      });
+    });
+  });
+
+  describe('DELETE /api/review/:id', () => {
+    console.log('in describe---->');
+    it('should successfully delete a review', done => {
+      console.log('in it block----->');
+      request.delete(`${url}/api/review/${this.tempReview._id}`)
+      .set({
+        Authorization: `Bearer ${this.tempToken}`,
+      })
+      .end((err, res) => {
+        if (err) return done(err);
+        expect(res.status).to.equal(204);
         done();
       });
     });
