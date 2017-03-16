@@ -129,7 +129,6 @@ describe('Review Routes', function() {
     mocReview.wayID = this.tempWay._id;
     Profile.findByIdAndAddReview(this.tempProfile._id, mocReview)
     .then( review => {
-      console.log('in review block', review);
       this.tempReview = review;
       done();
     })
@@ -186,6 +185,17 @@ describe('Review Routes', function() {
       });
     });
 
+    it('should send a 401 status, unauthorized', done => {
+
+      request.post(`${url}/api/wayerz/${this.tempProfile._id}/review`)
+
+      .send('badmockreview')
+      .end((err, res) => {
+        expect(err).to.be.an('error');
+        expect(res.status).to.equal(401);
+        done();
+      });
+    });
 
   });
 
@@ -201,6 +211,25 @@ describe('Review Routes', function() {
         expect(res.body.length).to.equal(1);
         expect(res.body[0].rating).to.equal(mocReview.rating);
         expect(res.body[0].comment).to.equal(mocReview.comment);
+        done();
+      });
+    });
+
+    it('should send a 404 status, bad review', done => {
+      request.get(`${url}/api/wayerz/review`)
+      .set({
+        Authorization: `Bearer ${this.tempToken}`,
+      })
+      .end((err, res) => {
+        expect(res.status).to.equal(404);
+        done();
+      });
+    });
+
+    it('should send a 401 status, unauthorized', done => {
+      request.get(`${url}/api/wayerz/review`)
+      .end((err, res) => {
+        expect(res.status).to.equal(404);
         done();
       });
     });
@@ -222,6 +251,32 @@ describe('Review Routes', function() {
         done();
       });
     });
+
+    it('should send a 400 status, bad request', done => {
+      var updated = { rating: 4 };
+      request.put(`${url}/api/review/${this.tempReview._id}`)
+      .set({
+        Authorization: `Bearer ${this.tempToken}`,
+      })
+      .end((err, res) => {
+        expect(err).to.be.an('error');
+        expect(res.status).to.equal(400);
+        done();
+      });
+    });
+
+    it('should send a 404 status, not found', done => {
+      var updated = { rating: 4 };
+      request.put(`${url}/api/review`)
+      .send(updated)
+      .set({
+        Authorization: `Bearer ${this.tempToken}`,
+      })
+      .end((err, res) => {
+        expect(res.status).to.equal(404);
+        done();
+      });
+    });
   });
 
   describe('DELETE /api/review/:id', () => {
@@ -237,6 +292,16 @@ describe('Review Routes', function() {
         done();
       });
     });
+
+    it('should send a 401 status, unauthorized', done => {
+      request.delete(`${url}/api/review/${this.tempReview._id}`)
+      .end((err, res) => {
+        expect(err).to.be.an('error');
+        expect(res.status).to.equal(401);
+        done();
+      });
+    });
+
   });
 
 });
