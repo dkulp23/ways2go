@@ -110,7 +110,7 @@ describe('Message Routes', function() {
   });
 
   describe('POST: /api/profile/:profileID/message' , () => {
-    describe('With Valid bo', () => {
+    describe('With Valid body', () => {
       it('should return a message', done =>{
         request.post(`${url}/api/profile/${this.tempProfile2._id}/message`)
         .send(testMessage)
