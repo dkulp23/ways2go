@@ -2,7 +2,7 @@
 Social networking rideshare solution for your daily commute.
 
 ***
-# **MODELS**
+## **MODELS**
 ***
 ### _User_
 This is the entry point for the ways2go interface. In order to interact with most of the features, each individual will be asked to provide a unique `username`, `password` and `email` address. This information will be stored securely and used to verify individuals each time they visit the site. ways2go leverages the [bcrypt](https://github.com/kelektiv/node.bcrypt.js) module to safely encrypt and match user passwords.
@@ -36,9 +36,10 @@ This will be the customizable home base for each individual user. The Profile `.
     - `timeStamp` is automatically generated when Profile is created
     - `reviews` is an array of review._id objects for reviews of Profile owner
 ***
-# ROUTES
+## ROUTES
 ***
-### **POST:**  _/api/user_
+### USER
+#### **POST:**  _/api/user_
 This is the endpoint to hit to sign up a new user.
 ##### Request
 There are three required components to the request that every user must provide in order to create an account:
@@ -57,8 +58,7 @@ Example
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbiI6IjVhNTFiZmI1YTlkYzJjYzY0MGRkODljODIwZjZkZWZjY2RiMGNmOTc2NGI4YjZkYTUwNDk4NzljOGNjOWZmNDIiLCJpYXQiOjE0ODk1OTIzMjB9.vfM9xh4iFZFOU_aFpWz_z4SbTAwjbAkuRCgnyyhgnEk
 ```
 
-### **GET:** _/api/user_
-
+#### **GET:** _/api/user_
 This is the endpoint to hit for a user to sign in.
 User will be asked to enter `username` and `password`.
 ways2go uses the bcrypt npm module to create and verify encypted passwords.
@@ -93,31 +93,32 @@ User must be signed in and provide token in `Authorization Header` to access thi
 Upon success:
 `res.status` => 200
 `res.text` => account removed
-### **POST** _/api/profile_
+### PROFILE
+#### **POST** _/api/profile_
 
 ##### *Request*
 
 ##### Response
 
-### GET /api/profile/:id
+#### GET /api/profile/:id
 
 ##### Request
 
 ##### Response
 
-### GET /api/profile
+#### GET /api/profile
 
 ##### Request
 
 ##### Response
 
-### PUT /api/profile
+#### PUT /api/profile
 
 ##### Request
 
 ##### Response
 
-### DELETE /api/profile
+#### DELETE /api/profile
 
 ##### Request
 
