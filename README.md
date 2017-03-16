@@ -1,6 +1,4 @@
-# ways2go
-Social networking rideshare solution for your daily commute.
-
+[![Coverage Status](https://coveralls.io/repos/github/dkulp23/ways2go/badge.svg?branch=staging)](https://coveralls.io/github/dkulp23/ways2go?branch=staging)
 ***
 # **MODELS**
 ***
@@ -35,9 +33,24 @@ This will be the customizable home base for each individual user. The Profile `.
     - `avgRating` is generated from aggregate of review ratings
     - `timeStamp` is automatically generated when Profile is created
     - `reviews` is an array of review._id objects for reviews of Profile owner
+
+### _Review_
+This feature will give users the ability to leave feedback for each other. When they are considering a ride with a particular person (or people) they can simply go to particular user's profile and see all Reviews that were left for that user. The fields each Review will contain are: `_id` - provided by [Mongodb](https://docs.mongodb.com/manual/core/document/),  `rating`, `comment`, `timestamp`- set automatically, `user id`, `way id`, and `reviewed user id`.
+
+```Javascript
+{
+  rating: { type: Number, required: true },
+  comment: { type: String, required: false },
+  timestamp: { type: Date, required: true, default: Date.now },
+  userID: { type: Schema.Types.ObjectId, required: true },
+  wayID: { type: Schema.Types.ObjectId, required: true},
+  reviewedUserID: { type: Schema.Types.ObjectId, required: true }
+}
+```
 ***
 # ROUTES
 ***
+## User
 ### **POST:**  _/api/user_
 This is the endpoint to hit to sign up a new user.
 ##### Request
@@ -66,8 +79,10 @@ ways2go uses the bcrypt npm module to create and verify encypted passwords.
 Authorization Header: `req.headers.authorization`
 Format: `username:password`
 ##### Response
-`res.text` will contain the authentication token that will allow the user to create or access their profile and all other routes.
+**IMPORTANT**
+`res.text` will contain the authentication token that will allow the user to **create or access their profile and all other routes**.
 **Token:**
+
 ```
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbiI6IjVhNTFiZmI1YTlkYzJjYzY0MGRkODljODIwZjZkZWZjY2RiMGNmOTc2NGI4YjZkYTUwNDk4NzljOGNjOWZmNDIiLCJpYXQiOjE0ODk1OTIzMjB9.vfM9xh4iFZFOU_aFpWz_z4SbTAwjbAkuRCgnyyhgnEk
 ```
@@ -84,7 +99,7 @@ The `res.text` property of the response object will contain a status code and me
 201
 password updated successfully
 ```
-### **DELETE** _/api/user_
+### **DELETE:** _/api/user_
 This endpoint will allow a user to remove their account.
 ##### Request
 User must be signed in and provide token in `Authorization Header` to access this route.
@@ -93,32 +108,89 @@ User must be signed in and provide token in `Authorization Header` to access thi
 Upon success:
 `res.status` => 200
 `res.text` => account removed
-### **POST** _/api/profile_
-
-##### *Request*
-
-##### Response
-
-### GET /api/profile/:id
-
+## Profile
+### **POST:** _/api/profile_
+This endpoint will allow a signed in user with a valid token to create a Profile.
 ##### Request
-
+There are four components on the `req.body` that can be provided by the user to create a profile:
+- displayName - unique handle displayed when interacting with features of the app
+- fullName - <optional> user's name
+- address - <optional> user's home address
+- bio - <optional> allows user to provide bio info (will be expanded in future iteration)
+Should be sent in JSON format:
+```json
+{ "displayName": "Rollin with my Homies", "fullName": "Joe Driver",
+"address": "2909 3rd Ave, Seattle, WA 98103",
+"bio": "Who says that the ride to work can't be fun?" }
+```
 ##### Response
-
-### GET /api/profile
-
+If successful, `res.status` will be `200` and `res.body` will be:
+```json
+{ "userID": "<user._id>", "displayName": "Rollin with my Homies", "fullName": "Joe Driver",
+"address": "2909 3rd Ave, Seattle, WA 98103",
+"bio": "Who says that the ride to work can't be fun?", "avgRating": "<avg score>", "timeStamp": "<time profile created>", "reviews": "[]" }
+```
+- `reviews` will be an empty array when profile is created
+### **GET:** _/api/profile/:id_
+This enpoint will allow a registered user, with a token, read access to a single, specific profile.
 ##### Request
-
+`http://ways2go.herokuapp.com/api/profile/<valid 24 character id>`
 ##### Response
-
+The requested profile on `res.body` in JSON format.
+```javascript
+{ "userID": "<user._id>", "displayName": "Rollin with my Homies", "fullName": "Joe Driver",
+"address": "2909 3rd Ave, Seattle, WA 98103",
+"bio": "Who says that the ride to work can't be fun?", "avgRating": "<avg score>", "timeStamp": "<time profile created>", "reviews": "[{array of Review objects}]" }
+```
+### **GET:** _/api/profile_
+Without specifying an ID, this endpoint returns an array of all profiles which can then be sorted or filtered by client side methods.
+##### Request
+[GET](http://ways2go.herokuapp.com/api/profile)
+`Authorization Header`: `'Bearer <token>'`
+##### Response
+The `res.body` will contain an array of all user profile objects:
+```javascript
+[{profile}, {profile1}, {profile2}]
+```
 ### PUT /api/profile
-
+Hitting this endpoint will allow a logged in user, with a token, to update their profile information:
 ##### Request
-
+[PUT](http://ways2go.herokuapp.com/api/profile)
+- `req.body`
+  `{ "displayName": "
 ##### Response
 
-### DELETE /api/profile
+### **DELETE:** _/api/profile_
 
 ##### Request
-
+`http://ways2go.herokuapp.com/api/profile`
 ##### Response
+## Review
+### **POST:** _/api/wayerz/:wayerzID/review_
+This endpoint will allow user to leave reviews for people with whom he/she just shared a ride, one at a time. Only signed in and authorized users can perform this operation.
+##### Request
+There are two properties a user will be able to add to a review body:
+- rating
+- comment
+
+They may choose to provide both or only submit a rating, which is allowed by our model.
+##### Response
+Will send a new Review to the database and update a `reviews` property on the reviewed user's profile.
+## **GET:** _/api/wayerz/:wayerzID/review_
+To have access to this endpoint a user will need to be signed in and choose a user they wish to see reviews for, the Reviews will then be pulled from that user's profile.
+##### Request
+Will look for the data for a particular way and must contain an `_id` for the user being reviewed.
+##### Response
+Will return all reviews left for a particular user.
+## **PUT:** _/api/review/:id_
+This endpoint will allow a user to edit a Review they previously left for a user. Only signed in and authorized users will be able to perform this operation.
+##### Request
+A rating and a comment will be sent in the `req.body`, where `req.body.rating` is required and `req.body.comment` is optional.
+##### Response
+An updated Review with an updated `res.body` will then be sent to the database.
+### **DELETE:** _/api/review/:id_
+This endpoint will allow an authorized user to delete a Review they've previously written.
+##### Request
+The request needs to contain an `_id` for that Review.
+##### Response
+Will return a `204 status` to confirm a successful deletion.
