@@ -11,8 +11,8 @@ const User = require('../model/user.js');
 
 const userRouter = module.exports = Router();
 
-userRouter.post('/api/user', jsonParser, function(req, res, next) {
-  debug('POST: /api/user');
+userRouter.post('/api/signup', jsonParser, function(req, res, next) {
+  debug('POST: /api/signup');
 
   let password = req.body.password;
   delete req.body.password;
@@ -26,8 +26,8 @@ userRouter.post('/api/user', jsonParser, function(req, res, next) {
   .catch(next);
 });
 
-userRouter.get('/api/user', basicAuth, function(req, res, next) {
-  debug('GET: /api/user');
+userRouter.get('/api/signin', basicAuth, function(req, res, next) {
+  debug('GET: /api/signin');
   User.findOne({ username: req.auth.username })
   .then( user => {
     if (!user) return next(createError(404, 'user not found'));
