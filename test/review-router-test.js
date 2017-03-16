@@ -253,7 +253,6 @@ describe('Review Routes', function() {
     });
 
     it('should send a 400 status, bad request', done => {
-      var updated = { rating: 4 };
       request.put(`${url}/api/review/${this.tempReview._id}`)
       .set({
         Authorization: `Bearer ${this.tempToken}`,
