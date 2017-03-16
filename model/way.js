@@ -19,7 +19,3 @@ const waySchema = Schema({
 });
 
 module.exports = mongoose.model('way', waySchema);
-
-// Way.methods.findByIdAndAddWayer = function(profile) {
-//
-// };
