@@ -6,30 +6,35 @@ Social networking rideshare solution for your daily commute.
 ***
 ### _User_
 This is the entry point for the ways2go interface. In order to interact with most of the features, each individual will be asked to provide a unique `username`, `password` and `email` address. This information will be stored securely and used to verify individuals each time they visit the site. ways2go leverages the [bcrypt](https://github.com/kelektiv/node.bcrypt.js) module to safely encrypt and match user passwords.
-```
+```javascript
 {
     username: "cool_commuter",
     password: "<super salty bcrypt password string>",
     email: "ray_tomlinson@arpa.net",
-    timeStamp: "<default to document when account was created>",
+    timeStamp: <Date supplied by default when document is created>,
     _id: "<supplied by MongoDB when document is created>"
 }
 ```
 
 ### _Profile_
 This will be the customizable home base for each individual user. The Profile `._id` provided by [Mongodb](https://docs.mongodb.com/manual/core/document/) will serve as the tether that loosely binds the individual to their Ways, Messages and Reviews.
-```
+```javascript
 {
-    userID: "<will be populated with user._id when document is created>",
+    userID: {Object},
     displayName: "Rollin with my Homies",
-    fullName: " ",
-    address: " ",
-    bio: " ",
-    avgRating: " ",
-    timeStamp: " ",
-    reviews: [{<array of MongoDB IDs with>}]
+    fullName: "Joe Driver",
+    address: "2909 3rd Ave, Seattle, WA 98103",
+    bio: "Who says that the ride to work can't be fun?!",
+    avgRating: Number,
+    timeStamp: Date,
+    reviews: [{Object}]
 }
 ```
+- Notes
+    - `userID` automatically created with `user._id` when Profile is created
+    - `avgRating` is generated from aggregate of review ratings
+    - `timeStamp` is automatically generated when Profile is created
+    - `reviews` is an array of review._id objects for reviews of Profile owner
 ***
 # ROUTES
 ***
@@ -42,7 +47,7 @@ There are three required components to the request that every user must provide 
  - email
 
 The request should be made in JSON format:
-```
+```json
 { "username": "helloworld", "password": "notpassword", "email": "valid@email.com" }
 ```
 ##### Response
@@ -58,7 +63,7 @@ This is the endpoint to hit for a user to sign in.
 User will be asked to enter `username` and `password`.
 ways2go uses the bcrypt npm module to create and verify encypted passwords.
 ##### Request
-Authorization Header: ` req.headers.authorization `
+Authorization Header: `req.headers.authorization`
 Format: `username:password`
 ##### Response
 `res.text` will contain the authentication token that will allow the user to create or access their profile and all other routes.
@@ -75,7 +80,7 @@ The property to be updated should be sent in JSON format within the `req.body`.
 `{ "password": "newpassword" }`
 ##### Response
 The `res.text` property of the response object will contain a status code and message. If successful:
-```sh
+```javascript
 201
 password updated successfully
 ```
