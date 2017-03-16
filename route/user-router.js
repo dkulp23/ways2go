@@ -54,8 +54,7 @@ userRouter.delete('/api/user', bearerAuth, function(req, res, next) {
   debug('DELETE: /api/user');
 
   User.findByIdAndRemove(req.user._id)
-  .then( removed => {
-    if (!removed) return next(createError(404, 'user not found'));
+  .then( () => {
     return next(res.status(204).send('account removed'));
   })
   .catch(next);
