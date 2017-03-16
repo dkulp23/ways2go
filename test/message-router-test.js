@@ -139,6 +139,21 @@ describe('Message Routes', function() {
         });
       });
     });
+//POST 401
+    // describe('Unauthorized Access for Posting', () => {
+    //   it('should respond with a 401 code ', done =>{
+    //     request.post(`${url}/api/profile/${this.tempProfile2._id}/message`)
+    // .send(testMessage)
+    // .set({
+    //   Authorization: 'Bearer scoobyDoo'
+    // })
+    // .end((err, res) => {
+    //   // expect(err).to.be.an('error');
+    //   expect(res.status).to.equal(401);
+    //   done();
+    // });
+    //   });
+    // });
 
     describe('With an invalid body', () => {
       it('should respond with a 400 code ', done =>{
@@ -201,6 +216,42 @@ describe('Message Routes', function() {
     });
   });
 
+  //PUT 400 Error
+
+  describe('PUT: /api/message/:id' , () => {
+    describe('Bad Body ', () => {
+      it('should return a 400 Error', done =>{
+        request.put(`${url}/api/message/${this.tempMessage._id}`)
+      .send({swag: 1999})
+      .set({
+        Authorization: `Bearer ${this.tempToken}`
+      })
+      .end((err, res) => {
+        expect(res.status).to.equal(400);
+        done();
+      });
+      });
+    });
+  });
+
+//PUT 401: Bad request
+  describe('PUT: /api/message/:id' , () => {
+    describe('Unauthorized Put Request ', () => {
+      it('should return a 401 Error', done =>{
+        request.put(`${url}/api/message/${this.tempMessage._id}`)
+      .send({text: 'new holla'})
+      .set({
+        Authorization: `Bearer ${this.tempToken2}`
+      })
+      .end((err, res) => {
+        expect(res.status).to.equal(401);
+        done();
+      });
+      });
+    });
+  });
+
+
   describe('DELETE: /api/message/:id' , () => {
     describe('With Valid ID', () => {
       it('should return a 204 code', done =>{
@@ -216,4 +267,18 @@ describe('Message Routes', function() {
       });
     });
   });
+  describe('Unauthorized Deletion Attempt', () => {
+    it('should return a 401 code', done =>{
+      request.delete(`${url}/api/message/${this.tempMessage._id}`)
+         .set({
+           Authorization: `Bearer ${this.tempToken2}`
+         })
+        .end((err, res) => {
+          expect(res.status).to.equal(401);
+          done();
+        });
+    });
+  });
+
+
 });
