@@ -3,8 +3,11 @@
 # ways2go
 Social networking rideshare solution for your daily commute.
 
+[Models](#MODELS) | [Routes](#ROUTES) | [About Us](#ABOUT)
+
 ***
 # **MODELS**
+[User](#User) | [Profile](Profile) | [Reviews](#Reviews) | [Ways](#Ways) | [Messages](#Messages) |
 ***
 ### _User_
 This is the entry point for the ways2go interface. In order to interact with most of the features, each individual will be asked to provide a unique `username`, `password` and `email` address. This information will be stored securely and used to verify individuals each time they visit the site. ways2go leverages the [bcrypt](https://github.com/kelektiv/node.bcrypt.js) module to safely encrypt and match user passwords.
@@ -52,7 +55,7 @@ This feature will give users the ability to leave feedback for each other. When 
 }
 ```
 ***
-# ROUTES
+# **ROUTES**
 ***
 ## User
 ### **POST:**  _/api/user_
@@ -161,11 +164,12 @@ Hitting this endpoint will allow a logged in user, with a token, to update their
 ##### Request
 [PUT](http://ways2go.herokuapp.com/api/profile)
 - `req.body`
-  `{ "displayName": "
+  `{ "displayName": "speed_racer" }`
 ##### Response
-
+The response body will contain the profile object and properties can be accessed individually:
+`res.body.<key>`
 ### **DELETE:** _/api/profile_
-
+The
 ##### Request
 `http://ways2go.herokuapp.com/api/profile`
 ##### Response
@@ -198,3 +202,11 @@ This endpoint will allow an authorized user to delete a Review they've previousl
 The request needs to contain an `_id` for that Review.
 ##### Response
 Will return a `204 status` to confirm a successful deletion.
+
+***
+# ABOUT US
+***
+### **Anna Ulanova** - Full Stack Developer - [@annaul](https://github.com/annaul)
+### **Darcy McCabe** - Full Stack Developer - [@darms](https://github.com/darms)
+### **Remil Marzan** - Full Stack Developer - [@remilonwheels](https://github.com/remilonwheels)
+### **Dana Kulp** - Full Stack Developer - [@dkulp23](https://github.com/dkulp23)
