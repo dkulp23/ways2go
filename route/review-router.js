@@ -33,7 +33,7 @@ reviewRouter.put('/api/review/:id', bearerAuth, jsonParser, function(req, res, n
   .then( review => res.json(review))
   .catch(next);
 });
- 
+
 reviewRouter.get('/api/wayerz/:wayerzID/review', bearerAuth, function(req, res, next) {
   debug('GET: /api/wayerz/:wayerzID/review');
 
