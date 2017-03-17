@@ -1,17 +1,19 @@
 [![Build Status](https://travis-ci.org/dkulp23/ways2go.svg?branch=master)](https://travis-ci.org/dkulp23/ways2go)
 [![Coverage Status](https://coveralls.io/repos/github/dkulp23/ways2go/badge.svg?branch=staging)](https://coveralls.io/github/dkulp23/ways2go?branch=staging)
 
-# ways2go
+# Ways2Go
 Social networking rideshare solution for your daily commute.
 
 [Models](#models) | [Routes](#routes) | [Testing](#testing) | [About Us](#about-us)
+
+[Ways2GO](./Ways2goDiagram.png)
 
 ***
 # **MODELS**
 [User](#user) | [Profile](#profile) | [Reviews](#review) | [Way](#way) | [Message](#message) |
 ***
 ### _User_
-This is the entry point for the ways2go interface. In order to interact with most of the features, each individual will be asked to provide a unique `username`, `password` and `email` address. This information will be stored securely and used to verify individuals each time they visit the site. ways2go leverages the [bcrypt](https://github.com/kelektiv/node.bcrypt.js) module to safely encrypt and match user passwords.
+This is the entry point for the Ways2Go interface. In order to interact with most of the features, each individual will be asked to provide a unique `username`, `password` and `email` address. This information will be stored securely and used to verify individuals each time they visit the site. Ways2Go leverages the [bcrypt](https://github.com/kelektiv/node.bcrypt.js) module to safely encrypt and match user passwords.
 ```javascript
 {
     username: "cool_commuter",
@@ -55,6 +57,21 @@ This feature will give users the ability to leave feedback for each other. When 
   reviewedUserID: { type: Schema.Types.ObjectId, required: true }
 }
 ```
+### _Message_
+This feature is only available to authorized members of the Ways2Go community.  Unregistered members see routes, but can only contact them about sharing rides once they've been accepted into the community. By requiring membership we are able to better foster a community of trust for our users.This information is linked back to users through the profile model, via the toProfileID and fromProfileID properties.
+```javascript
+{
+    toProfileID:{ type: Schema.Types.ObjectId, required: true },
+  fromProfileID: { type: Schema.Types.ObjectId, required: true },
+  timestamp: { type: Date, default: Date.now },
+  text : { type: String, required: true }
+}
+```
+- Notes
+    - `toProfileID` automatically created with `user._id` when Profile is created
+    - `fromProfileID` is generated from aggregate of review ratings
+    - `timeStamp` is automatically generated when Message is created
+    - `text` the body of the message being sent by the user
 ***
 # **ROUTES**
 ***
@@ -82,7 +99,7 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbiI6IjVhNTFiZmI1YTlkYzJjYzY0MGRkODl
 
 This is the endpoint to hit for a user to sign in.
 User will be asked to enter `username` and `password`.
-ways2go uses the bcrypt npm module to create and verify encypted passwords.
+Ways2Go uses the bcrypt npm module to create and verify encypted passwords.
 ##### Request
 Authorization Header: `req.headers.authorization`
 Format: `username:password`
@@ -194,7 +211,7 @@ To have access to this endpoint a user will need to be signed in and choose a us
 Will look for the data for a particular way and must contain an `_id` for the user being reviewed.
 ##### Response
 Will return all reviews left for a particular user.
-## **PUT:** _/api/review/:id_
+### **PUT:** _/api/review/:id_
 This endpoint will allow a user to edit a Review they previously left for a user. Only signed in and authorized users will be able to perform this operation.
 ##### Request
 A rating and a comment will be sent in the `req.body`, where `req.body.rating` is required and `req.body.comment` is optional.
@@ -207,6 +224,236 @@ The request needs to contain an `_id` for that Review.
 ##### Response
 Will return a `204 status` to confirm a successful deletion.
 ***
+## WAY  |  [top](#ways2go)
+***
+### **POST:**  _/api/way_
+This is the endpoint for an authorized user to create a new Way.
+##### Request
+There are five components on the `req.body` that can be provided by the user to create a way, two of which are required:
+ - startLocation
+ - endLocation
+ - recurringDayOfWeek <optional>
+ - startTime <optional>
+ - oneTimeDate <optional>
+
+The request body should be made in JSON format:
+
+```json
+{ "startLocation": "123 N Jump St Seattle WA 9812",
+  "endLocation": "99 Problems Ave Seattle WA 98108" }
+```
+##### Response
+If successful, `res.status` will be `200` and `res.body` will be the Way that was saved to the database:
+Example
+```json
+{ "profileID": "58cb5469422bbb001115c74f",
+  "startLocationID": "58cb6af2422bbb001115c758",
+  "endLocationID": "58cb6af2422bbb001115c759",
+  "_id": "58cb6af2422bbb001115c75a",
+  "recurringDayOfWeek": [],
+  "timestamp": "2017-03-17T04:49:54.925Z",
+  "wayerz": [ "58cb5469422bbb001115c74f" ] }
+```
+
+### **GET:**  _/api/way/:id_
+This is the endpoint to return a Way of a specified `_id` property. If the ID is not specified, an array of all Way objects. ***NOTE:*** This endpoint does not require authorization and is publically available.
+##### Request
+No additional parameters required for this endpoint
+##### Response
+If successful, `res.status` will be `200` and `res.body` will be Way returned from the database:
+Example
+```json
+{
+    "__v": 1,
+    "_id": "58cb6af2422bbb001115c75a",
+    "endLocationID": {
+        "__v": 0,
+        "_id": "58cb6af2422bbb001115c759",
+        "city": "Seattle",
+        "number": "99",
+        "state": "WA",
+        "street": "Problems",
+        "timestamp": "2017-03-17T04:49:54.909Z",
+        "type": "Ave",
+        "zip": "98108"
+    },
+    "profileID": "58cb5469422bbb001115c74f",
+    "recurringDayOfWeek": [],
+    "startLocationID": {
+        "__v": 0,
+        "_id": "58cb6af2422bbb001115c758",
+        "city": "Seattle",
+        "number": "123",
+        "prefix": "N",
+        "state": "WA",
+        "street": "Jump",
+        "timestamp": "2017-03-17T04:49:54.906Z",
+        "type": "St",
+        "zip": "98121"
+    },
+    "timestamp": "2017-03-17T04:49:54.925Z",
+    "wayerz": [
+        {
+            "__v": 0,
+            "_id": "58cb5469422bbb001115c74f",
+            "displayName": "ayowayer",
+            "reviews": [],
+            "timeStamp": "2017-03-17T03:13:45.018Z",
+            "userID": "58cb4aaddb9f2e0011bc74b3"
+        }
+    ]
+}
+```
+
+### **PUT:**  _/api/way/:id_
+This is the endpoint for an authorized user to update Way of a specified `_id` property. The authorized user is required to have the associated `profileID` to the Way to successfully update.
+##### Request
+There are five components on the `req.body` that can be provided by the user to update a way:
+ - startLocation
+ - endLocation
+ - recurringDayOfWeek
+ - startTime
+ - oneTimeDate
+
+The request body should be made in JSON format:
+
+```json
+{  "startTime":630,
+  "recurringDayOfWeek":[1,2,3] }
+```
+##### Response
+If successful, `res.status` will be `200` and `res.body` will be the updated Way that was saved to the database:
+Example
+```json
+{ "_id":"58cb6af2422bbb001115c75a",
+  "profileID":"58cb5469422bbb001115c74f",
+  "startLocationID":"58cb6af2422bbb001115c758",
+  "endLocationID":"58cb6af2422bbb001115c759",
+  "__v":1,
+  "startTime":630,
+  "recurringDayOfWeek":[1,2,3]
+  ,"timestamp":"2017-03-17T04:49:54.925Z",
+  "wayerz":["58cb5469422bbb001115c74f"] }
+```
+
+### **DELETE:**  _/api/way/:id_
+This is the endpoint for an authorized user to remove a Way of a specified `_id` property. The authorized user is required to have the associated `profileID` to the Way to successfully delete.
+
+##### Request
+User must be signed in and provide token in `Authorization Header` to access this route.
+`'Bearer <token>'` *\(single space between fields required*)
+##### Response
+Upon success:
+`res.status` => 204
+
+### **POST:**  _/api/way/:wayID/wayerz/:wayerID_
+This is the endpoint for an authorized user to add another user(`wayerID`) to members of the rideshare(wayerz).
+##### Request
+Although that this request is a POST, a body is not to be provided in this request. The `wayerID` provided as a request url parameter will be the associated `profileID` for the user that is to be added to the `wayerz` of a specified `wayID`.
+
+User must be signed in and provide token in `Authorization Header` to access this route.
+`'Bearer <token>'` *\(single space between fields required*)
+##### Response
+If successful, `res.status` will be `200` and `res.body` will be the Way with an updated wayers property that was saved to the database:
+Example
+```json
+{ "_id":"58cb6af2422bbb001115c75a",
+  "profileID":"58cb5469422bbb001115c74f",
+  "startLocationID":"58cb6af2422bbb001115c758",
+  "endLocationID":"58cb6af2422bbb001115c759",
+  "__v":2,
+  "startTime":630,
+  "recurringDayOfWeek":[1,2,3],
+  "timestamp":"2017-03-17T04:49:54.925Z",
+  "wayerz":["58cb5469422bbb001115c74f","58cb81c0a766d40011ec1c34"] }
+```
+
+### **DELETE:**  _/api/way/:wayID/wayerz/:wayerID_
+This is the endpoint for an authorized user to remove another user(`wayerID`) from the members of the rideshare(wayerz).
+##### Request
+User must be signed in and provide token in `Authorization Header` to access this route.
+`'Bearer <token>'` *\(single space between fields required*)
+##### Response
+If successful, `res.status` will be `200` and `res.body` will be the Way with an updated wayers property that was saved to the database:
+Example
+```json
+{ "_id":"58cb6af2422bbb001115c75a",
+  "profileID":"58cb5469422bbb001115c74f",
+  "startLocationID":"58cb6af2422bbb001115c758",
+  "endLocationID":"58cb6af2422bbb001115c759",
+  "__v":2,
+  "startTime":630,
+  "recurringDayOfWeek":[1,2,3],
+  "timestamp":"2017-03-17T04:49:54.925Z",
+  "wayerz":["58cb5469422bbb001115c74f"] }
+```
+## MESSAGE  |  [top](#ways2go)
+### **POST:**  _/api/profile/:profileID/message_
+This is the endpoint for a user to create a new message.
+##### Request
+The request should be made in JSON format:
+```json
+{ "profileID": 6789, "password": "notpassword", "email": "valid@email.com" }
+```
+##### Response
+Will either indicate success or failure in creating a new message
+```javascript
+200
+Allows user to post a message
+```
+```javascript
+400
+Invalid Body, unable to create a message
+```
+### **GET:** _/api/message/:id_
+This is the endpoint for a user to retrieve their messages.
+User will be asked to enter `username` and `password`.
+Ways2Go uses the bcrypt npm module to create and verify encypted passwords.
+##### Request
+Authorization Header: `req.headers.authorization`
+Format: `username:password`
+##### Response
+`res.text` will contain the authentication token that will allow the user to access their messages.
+```javascript
+200
+Allows user to review previous messages
+```
+```javascript
+404
+Not Found
+```
+### **PUT:** _/api/message/:id_
+This endpoint will allow users to update the`text` in a message.
+##### Request
+User must be signed in and provide token in `Authorization Header`
+`'Bearer <token>'` *\(single space between fields required*
+The property to be updated should be sent in JSON format within the `req.body`.
+`{ "password": "newpassword" }`
+##### Response
+The `res.text` property of the response object will contain a status code and message. If successful:
+```javascript
+200
+Including any updated text from the user
+```
+```javascript
+400
+Bad request
+```
+```javascript
+401
+Unauthorized to make any updates
+```
+### **DELETE** _/api/message/:id_
+This endpoint will allow a user to remove a message they have sent.
+##### Request
+User must be signed in and provide token in `Authorization Header` to access this route.
+`'Bearer <token>'` *\(single space between fields required*)
+##### Response
+Upon success:
+`res.status` => 200
+Upon failure:
+`res.status` => 401
+`res.text`: Sorry, you do not have access to these messages
 ### **DEPENDENCIES** |  [top](#ways2go)
 _Without this wizardry, there would be no ways2go._
 ***
