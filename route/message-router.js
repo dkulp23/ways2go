@@ -14,15 +14,12 @@ const messageRouter = module.exports = Router();
 
 messageRouter.post('/api/profile/:profileID/message', bearerAuth, jsonParser, function(req, res, next) {
   debug('POST: /api/profile/:profileID/message');
-  // console.log('req.params.profileID', req.params.profileID);
 
   Profile.findOne({ userID: req.user._id })
   .then( profile => {
 
-    // console.log('in the routes------.', profile);
     req.body.fromProfileID = profile._id;
     req.body.toProfileID = req.params.profileID;
-    // console.log('ProfileID:********', req.params.profileID);
     return new Message(req.body).save();
   })
   .then( message => {
@@ -31,7 +28,7 @@ messageRouter.post('/api/profile/:profileID/message', bearerAuth, jsonParser, fu
   })
   .catch(next);
 });
-//GET
+
 messageRouter.get('/api/message/:id', bearerAuth, jsonParser, function(req, res, next) {
   debug('GET: /api/message/:id');
 
@@ -49,7 +46,6 @@ messageRouter.get('/api/message/:id', bearerAuth, jsonParser, function(req, res,
     .catch(next);
 });
 
-//PUT
   messageRouter.put('/api/message/:id', bearerAuth, jsonParser, function(req, res, next) {
     debug('PUT: /api/message/:id');
 
@@ -76,14 +72,12 @@ messageRouter.get('/api/message/:id', bearerAuth, jsonParser, function(req, res,
   return Message.findByIdAndUpdate(message._id, req.body, { new:true });
 })
 .then( message => {
-  console.log('message*******************>>', message);
   res.json(message);
 
 })
 .catch(next);
   });
 
-//DELETE
   messageRouter.delete('/api/message/:id', bearerAuth, jsonParser, function(req, res, next) {
     debug('PUT: /api/message/:id');
 
@@ -106,8 +100,4 @@ messageRouter.get('/api/message/:id', bearerAuth, jsonParser, function(req, res,
 .then( () => res.send(204))
 .catch(next);
   });
-
-
-
-//end
 });

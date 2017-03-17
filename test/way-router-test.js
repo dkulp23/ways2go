@@ -228,7 +228,6 @@ describe('Way Routes', function() {
   describe('POST: /api/way/:wayID/wayerz/:wayerID', () => {
     describe('with a valid way owner and valid way & wayer id', () => {
       it('should return a way with updated wayerz', done => {
-        console.log('test this tempWay', this.tempWay);
         request.post(`${url}/api/way/${this.tempWay._id}/wayerz/${this.tempProfile2._id}`)
         .set({
           Authorization: `Bearer ${this.tempToken}`,
@@ -246,7 +245,6 @@ describe('Way Routes', function() {
 
     describe('with valid way & wayer id but a user that doesnt own the way', () => {
       it('should return a 401 code', done => {
-        console.log('test this tempWay', this.tempWay);
         request.post(`${url}/api/way/${this.tempWay._id}/wayerz/${this.tempProfile2._id}`)
         .set({
           Authorization: `Bearer ${this.tempToken2}`,
@@ -260,7 +258,6 @@ describe('Way Routes', function() {
 
     describe('with an valid way owner, valid way but invalid wayer id', () => {
       it('should return a 404 code', done => {
-        console.log('test this tempWay', this.tempWay);
         request.post(`${url}/api/way/${this.tempWay._id}/wayerz/badID`)
         .set({
           Authorization: `Bearer ${this.tempToken}`,
@@ -286,7 +283,6 @@ describe('Way Routes', function() {
 
     describe('with a valid way owner and valid way & wayer id', () => {
       it('should return a way with updated wayerz', done => {
-        console.log('test this tempWay', this.tempWay);
         request.delete(`${url}/api/way/${this.tempWay2Wayers._id}/wayerz/${this.tempProfile2._id}`)
         .set({
           Authorization: `Bearer ${this.tempToken}`,
@@ -326,7 +322,6 @@ describe('Way Routes', function() {
         })
         .end((err, res) => {
           if (err) done(err);
-          console.log('get way res body',res.body);
           expect(res.status).to.equal(200);
           expect(res.body._id).to.equal(this.tempWay._id.toString());
           expect(res.body.startLocationID).to.have.property('street');
