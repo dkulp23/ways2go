@@ -1,17 +1,19 @@
 [![Build Status](https://travis-ci.org/dkulp23/ways2go.svg?branch=master)](https://travis-ci.org/dkulp23/ways2go)
 [![Coverage Status](https://coveralls.io/repos/github/dkulp23/ways2go/badge.svg?branch=staging)](https://coveralls.io/github/dkulp23/ways2go?branch=staging)
 
-# ways2go
+# Ways2Go
 Social networking rideshare solution for your daily commute.
 
 [Models](#models) | [Routes](#routes) | [Testing](#testing) | [About Us](#about-us)
+
+[Ways2GO](./Ways2goDiagram.png)
 
 ***
 # **MODELS**
 [User](#user) | [Profile](#profile) | [Reviews](#review) | [Way](#way) | [Message](#message) |
 ***
 ### _User_
-This is the entry point for the ways2go interface. In order to interact with most of the features, each individual will be asked to provide a unique `username`, `password` and `email` address. This information will be stored securely and used to verify individuals each time they visit the site. ways2go leverages the [bcrypt](https://github.com/kelektiv/node.bcrypt.js) module to safely encrypt and match user passwords.
+This is the entry point for the Ways2Go interface. In order to interact with most of the features, each individual will be asked to provide a unique `username`, `password` and `email` address. This information will be stored securely and used to verify individuals each time they visit the site. Ways2Go leverages the [bcrypt](https://github.com/kelektiv/node.bcrypt.js) module to safely encrypt and match user passwords.
 ```javascript
 {
     username: "cool_commuter",
@@ -55,6 +57,21 @@ This feature will give users the ability to leave feedback for each other. When 
   reviewedUserID: { type: Schema.Types.ObjectId, required: true }
 }
 ```
+### _Message_
+This feature is only available to authorized members of the Ways2Go community.  Unregistered members see routes, but can only contact them about sharing rides once they've been accepted into the community. By requiring membership we are able to better foster a community of trust for our users.This information is linked back to users through the profile model, via the toProfileID and fromProfileID properties.
+```javascript
+{
+    toProfileID:{ type: Schema.Types.ObjectId, required: true },
+  fromProfileID: { type: Schema.Types.ObjectId, required: true },
+  timestamp: { type: Date, default: Date.now },
+  text : { type: String, required: true }
+}
+```
+- Notes
+    - `toProfileID` automatically created with `user._id` when Profile is created
+    - `fromProfileID` is generated from aggregate of review ratings
+    - `timeStamp` is automatically generated when Message is created
+    - `text` the body of the message being sent by the user
 ***
 # **ROUTES**
 ***
@@ -82,7 +99,7 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbiI6IjVhNTFiZmI1YTlkYzJjYzY0MGRkODl
 
 This is the endpoint to hit for a user to sign in.
 User will be asked to enter `username` and `password`.
-ways2go uses the bcrypt npm module to create and verify encypted passwords.
+Ways2Go uses the bcrypt npm module to create and verify encypted passwords.
 ##### Request
 Authorization Header: `req.headers.authorization`
 Format: `username:password`
@@ -370,7 +387,73 @@ Example
   "timestamp":"2017-03-17T04:49:54.925Z",
   "wayerz":["58cb5469422bbb001115c74f"] }
 ```
-
+## MESSAGE  |  [top](#ways2go)
+### **POST:**  _/api/profile/:profileID/message_
+This is the endpoint for a user to create a new message.
+##### Request
+The request should be made in JSON format:
+```json
+{ "profileID": 6789, "password": "notpassword", "email": "valid@email.com" }
+```
+##### Response
+Will either indicate success or failure in creating a new message
+```javascript
+200
+Allows user to post a message
+```
+```javascript
+400
+Invalid Body, unable to create a message
+```
+### **GET:** _/api/message/:id_
+This is the endpoint for a user to retrieve their messages.
+User will be asked to enter `username` and `password`.
+Ways2Go uses the bcrypt npm module to create and verify encypted passwords.
+##### Request
+Authorization Header: `req.headers.authorization`
+Format: `username:password`
+##### Response
+`res.text` will contain the authentication token that will allow the user to access their messages.
+```javascript
+200
+Allows user to review previous messages
+```
+```javascript
+404
+Not Found
+```
+### **PUT:** _/api/message/:id_
+This endpoint will allow users to update the`text` in a message.
+##### Request
+User must be signed in and provide token in `Authorization Header`
+`'Bearer <token>'` *\(single space between fields required*
+The property to be updated should be sent in JSON format within the `req.body`.
+`{ "password": "newpassword" }`
+##### Response
+The `res.text` property of the response object will contain a status code and message. If successful:
+```javascript
+200
+Including any updated text from the user
+```
+```javascript
+400
+Bad request
+```
+```javascript
+401
+Unauthorized to make any updates
+```
+### **DELETE** _/api/message/:id_
+This endpoint will allow a user to remove a message they have sent.
+##### Request
+User must be signed in and provide token in `Authorization Header` to access this route.
+`'Bearer <token>'` *\(single space between fields required*)
+##### Response
+Upon success:
+`res.status` => 200
+Upon failure:
+`res.status` => 401
+`res.text`: Sorry, you do not have access to these messages
 ### **DEPENDENCIES** |  [top](#ways2go)
 _Without this wizardry, there would be no ways2go._
 ***
