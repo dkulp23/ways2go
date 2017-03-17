@@ -4,11 +4,11 @@
 # ways2go
 Social networking rideshare solution for your daily commute.
 
-[Models](#models) | [Routes](#routes) | [About Us](#about-us)
+[Models](#models) | [Routes](#routes) | [Testing](#testing) | [About Us](#about-us)
 
 ***
 # **MODELS**
-[User](#user) | [Profile](#profile) | [Reviews](#reviews) | [Ways](#ways) | [Messages](#messages) |
+[User](#user) | [Profile](#profile) | [Reviews](#review) | [Way](#way) | [Message](#message) |
 ***
 ### _User_
 This is the entry point for the ways2go interface. In order to interact with most of the features, each individual will be asked to provide a unique `username`, `password` and `email` address. This information will be stored securely and used to verify individuals each time they visit the site. ways2go leverages the [bcrypt](https://github.com/kelektiv/node.bcrypt.js) module to safely encrypt and match user passwords.
@@ -203,6 +203,40 @@ This endpoint will allow an authorized user to delete a Review they've previousl
 The request needs to contain an `_id` for that Review.
 ##### Response
 Will return a `204 status` to confirm a successful deletion.
+***
+# **DEPENDENCIES**
+_Without this wizardry, there would be no ways2go._
+***
+[Node](https://nodejs.org/api/)
+* [Express](http://expressjs.com/en/4x/api.html)
+* [Mongoose](http://mongoosejs.com/docs/api.html)
+* [bcrypt](https://github.com/kelektiv/node.bcrypt.js)
+* [Bluebird](http://bluebirdjs.com/docs/api-reference.html)
+* [Morgan](https://github.com/expressjs/morgan)
+* [Cors](https://github.com/expressjs/cors)
+* [JWT](https://github.com/auth0/node-jsonwebtoken)
+* [HTTP-Errors](https://github.com/jshttp/http-errors)
+* [Body-Parser](https://github.com/expressjs/body-parser)
+* [dot-env](https://github.com/motdotla/dotenv)
+* [parse-address](https://github.com/hassansin/parse-address)
+***
+# **TESTING**
+***
+* [Mocha Test Framework](https://mochajs.org/)
+* [Chai Assertion Library](http://chaijs.com/api/bdd/)
+* [Superagent](https://visionmedia.github.io/superagent/)
+* [Gulp](https://github.com/gulpjs/gulp/blob/master/docs/API.md)
+* [Coveralls](https://coveralls.zendesk.com/hc/en-us/articles/201769715-Javascript-Node)
+* [Debug](https://github.com/visionmedia/debug)
+
+***
+# **INTEGRATION**
+***
+[Travis CI](https://docs.travis-ci.com/)
+***
+# **DEPLOYMENT**
+***
+[Heroku](https://devcenter.heroku.com/)
 
 ***
 # ABOUT US
