@@ -6,7 +6,7 @@ Social networking rideshare solution for your daily commute.
 
 [Models](#models) | [Routes](#routes) | [Testing](#testing) | [About Us](#about-us)
 
-[Ways2GO](./Ways2goDiagram.png)
+![Ways2GO](./Ways2goDiagram.png)
 
 ***
 # **MODELS**
