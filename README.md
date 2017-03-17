@@ -387,6 +387,7 @@ Example
   "timestamp":"2017-03-17T04:49:54.925Z",
   "wayerz":["58cb5469422bbb001115c74f"] }
 ```
+
 ## MESSAGE  |  [top](#ways2go)
 ### **POST:**  _/api/profile/:profileID/message_
 This is the endpoint for a user to create a new message.
@@ -454,6 +455,7 @@ Upon success:
 Upon failure:
 `res.status` => 401
 `res.text`: Sorry, you do not have access to these messages
+
 ### **DEPENDENCIES** |  [top](#ways2go)
 _Without this wizardry, there would be no ways2go._
 ***
