@@ -58,7 +58,7 @@ This feature will give users the ability to leave feedback for each other. When 
 ***
 # **ROUTES**
 ***
-## User
+## User [_top_](#ways2go)
 ### **POST:**  _/api/user_
 This is the endpoint to hit to sign up a new user.
 ##### Request
@@ -116,7 +116,7 @@ User must be signed in and provide token in `Authorization Header` to access thi
 Upon success:
 `res.status` => 200
 `res.text` => account removed
-## Profile
+## Profile [_top_](#ways2go)
 ### **POST:** _/api/profile_
 This endpoint will allow a signed in user with a valid token to create a Profile.
 ##### Request
@@ -163,18 +163,21 @@ The `res.body` will contain an array of all user profile objects:
 ### PUT /api/profile
 Hitting this endpoint will allow a logged in user, with a token, to update their profile information:
 ##### Request
-[PUT](http://ways2go.herokuapp.com/api/profile)
+`http://ways2go.herokuapp.com/api/profile`
 - `req.body`
   `{ "displayName": "speed_racer" }`
 ##### Response
 The response body will contain the profile object and properties can be accessed individually:
 `res.body.<key>`
 ### **DELETE:** _/api/profile_
-The
+This endpoint will allow a user to remove their profile from the database. In order to keep the database clean, the 'pre' hook middleware of Mongoose is leveraged to also remove any resources related to the profile.
 ##### Request
 `http://ways2go.herokuapp.com/api/profile`
+
 ##### Response
-## Review
+If profile is successfully removed, `res.status` will equal `204`.
+There will be no `res.body`.
+## Review [_top_](#ways2go)
 ### **POST:** _/api/wayerz/:wayerzID/review_
 This endpoint will allow user to leave reviews for people with whom he/she just shared a ride, one at a time. Only signed in and authorized users can perform this operation.
 ##### Request
@@ -204,10 +207,10 @@ The request needs to contain an `_id` for that Review.
 ##### Response
 Will return a `204 status` to confirm a successful deletion.
 ***
-# **DEPENDENCIES**
+### **DEPENDENCIES** [_top_](#ways2go)
 _Without this wizardry, there would be no ways2go._
 ***
-[Node](https://nodejs.org/api/)
+* [Node](https://nodejs.org/api/)
 * [Express](http://expressjs.com/en/4x/api.html)
 * [Mongoose](http://mongoosejs.com/docs/api.html)
 * [bcrypt](https://github.com/kelektiv/node.bcrypt.js)
@@ -220,7 +223,7 @@ _Without this wizardry, there would be no ways2go._
 * [dot-env](https://github.com/motdotla/dotenv)
 * [parse-address](https://github.com/hassansin/parse-address)
 ***
-# **TESTING**
+### **TESTING** [_top_](#ways2go)
 ***
 * [Mocha Test Framework](https://mochajs.org/)
 * [Chai Assertion Library](http://chaijs.com/api/bdd/)
@@ -230,16 +233,16 @@ _Without this wizardry, there would be no ways2go._
 * [Debug](https://github.com/visionmedia/debug)
 
 ***
-# **INTEGRATION**
+### **INTEGRATION** [_top_](#ways2go)
 ***
 [Travis CI](https://docs.travis-ci.com/)
 ***
-# **DEPLOYMENT**
+### **DEPLOYMENT** [_top_](#ways2go)
 ***
 [Heroku](https://devcenter.heroku.com/)
 
 ***
-# ABOUT US
+# ABOUT US [_top_](#ways2go)
 ***
 ### **Anna Ulanova** - Full Stack Developer - [@annaul](https://github.com/annaul)
 ### **Darcy McCabe** - Full Stack Developer - [@darms](https://github.com/darms)
