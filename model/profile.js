@@ -28,7 +28,7 @@ Profile.findByIdAndAddReview = function(id, review) {
   debug('findByIdAndAddReview');
 
   return Profile.findById(id)
-  .catch( err => Promise.reject(createError(404, err.message)))
+  // .catch( err => Promise.reject(createError(404, err.message)))
   .then( profile => {
     review.reviewedUserID = profile._id;
     this.tempProfile = profile;
@@ -41,5 +41,6 @@ Profile.findByIdAndAddReview = function(id, review) {
   })
   .then( () => {
     return this.tempReview;
-  });
+  })
+  .catch( err => Promise.reject(err));
 };
