@@ -18,7 +18,7 @@ This is the entry point for the ways2go interface. In order to interact with mos
     password: "<super salty bcrypt password string>",
     email: "ray_tomlinson@arpa.net",
     timeStamp: <Date supplied by default when document is created>,
-    _id: "<supplied by MongoDB when document is created>"
+    _id: { Object supplied by MongoDB when document is created }
 }
 ```
 
@@ -58,7 +58,7 @@ This feature will give users the ability to leave feedback for each other. When 
 ***
 # **ROUTES**
 ***
-## User [_top_](#ways2go)
+## User  |  [top](#ways2go)
 ### **POST:**  _/api/user_
 This is the endpoint to hit to sign up a new user.
 ##### Request
@@ -116,7 +116,7 @@ User must be signed in and provide token in `Authorization Header` to access thi
 Upon success:
 `res.status` => 200
 `res.text` => account removed
-## Profile [_top_](#ways2go)
+## Profile  |  [top](#ways2go)
 ### **POST:** _/api/profile_
 This endpoint will allow a signed in user with a valid token to create a Profile.
 ##### Request
@@ -177,7 +177,7 @@ This endpoint will allow a user to remove their profile from the database. In or
 ##### Response
 If profile is successfully removed, `res.status` will equal `204`.
 There will be no `res.body`.
-## Review [_top_](#ways2go)
+## Review |  [top](#ways2go)
 ### **POST:** _/api/wayerz/:wayerzID/review_
 This endpoint will allow user to leave reviews for people with whom he/she just shared a ride, one at a time. Only signed in and authorized users can perform this operation.
 ##### Request
@@ -207,7 +207,7 @@ The request needs to contain an `_id` for that Review.
 ##### Response
 Will return a `204 status` to confirm a successful deletion.
 ***
-### **DEPENDENCIES** [_top_](#ways2go)
+### **DEPENDENCIES** |  [top](#ways2go)
 _Without this wizardry, there would be no ways2go._
 ***
 * [Node](https://nodejs.org/api/)
@@ -223,7 +223,7 @@ _Without this wizardry, there would be no ways2go._
 * [dot-env](https://github.com/motdotla/dotenv)
 * [parse-address](https://github.com/hassansin/parse-address)
 ***
-### **TESTING** [_top_](#ways2go)
+### **TESTING** |  [top](#ways2go)
 ***
 * [Mocha Test Framework](https://mochajs.org/)
 * [Chai Assertion Library](http://chaijs.com/api/bdd/)
@@ -233,16 +233,16 @@ _Without this wizardry, there would be no ways2go._
 * [Debug](https://github.com/visionmedia/debug)
 
 ***
-### **INTEGRATION** [_top_](#ways2go)
+### **INTEGRATION** |  [top](#ways2go)
 ***
 [Travis CI](https://docs.travis-ci.com/)
 ***
-### **DEPLOYMENT** [_top_](#ways2go)
+### **DEPLOYMENT** |  [top](#ways2go)
 ***
 [Heroku](https://devcenter.heroku.com/)
 
 ***
-# ABOUT US [_top_](#ways2go)
+# ABOUT US |  [top](#ways2go)
 ***
 ### **Anna Ulanova** - Full Stack Developer - [@annaul](https://github.com/annaul)
 ### **Darcy McCabe** - Full Stack Developer - [@darms](https://github.com/darms)
