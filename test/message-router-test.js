@@ -14,7 +14,6 @@ require('../server.js');
 
 const url = `http://localhost:${process.env.PORT}`;
 
-
 const testUser = {
   username: 'tester name',
   password: 'password',
@@ -62,7 +61,6 @@ describe('Message Routes', function() {
   });
 
   beforeEach( done => {
-    // this.tempProfile = testProfile;
     testProfile.userID = this.tempUser._id;
     new Profile(testProfile).save()
     .then( profile => {
@@ -71,8 +69,6 @@ describe('Message Routes', function() {
     })
     .catch(done);
   });
-
-    ///testuser2 below
 
   beforeEach( done => {
     new User(testUser2)
@@ -89,9 +85,7 @@ describe('Message Routes', function() {
           .catch(done);
   });
 
-
   beforeEach( done => {
-    // this.tempProfile2 = testProfile2;
     testProfile2.userID = this.tempUser2._id;
     new Profile(testProfile2).save()
       .then( profile => {
@@ -139,21 +133,6 @@ describe('Message Routes', function() {
         });
       });
     });
-//POST 401
-    // describe('Unauthorized Access for Posting', () => {
-    //   it('should respond with a 401 code ', done =>{
-    //     request.post(`${url}/api/profile/${this.tempProfile2._id}/message`)
-    // .send(testMessage)
-    // .set({
-    //   Authorization: 'Bearer scoobyDoo'
-    // })
-    // .end((err, res) => {
-    //   // expect(err).to.be.an('error');
-    //   expect(res.status).to.equal(401);
-    //   done();
-    // });
-    //   });
-    // });
 
     describe('With an invalid body', () => {
       it('should respond with a 400 code ', done =>{
@@ -216,8 +195,6 @@ describe('Message Routes', function() {
     });
   });
 
-  //PUT 400 Error
-
   describe('PUT: /api/message/:id' , () => {
     describe('Bad Body ', () => {
       it('should return a 400 Error', done =>{
@@ -234,7 +211,6 @@ describe('Message Routes', function() {
     });
   });
 
-//PUT 401: Bad request
   describe('PUT: /api/message/:id' , () => {
     describe('Unauthorized Put Request ', () => {
       it('should return a 401 Error', done =>{
@@ -279,6 +255,4 @@ describe('Message Routes', function() {
         });
     });
   });
-
-
 });
