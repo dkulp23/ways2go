@@ -1,6 +1,7 @@
 [![Build Status](https://travis-ci.org/dkulp23/ways2go.svg?branch=master)](https://travis-ci.org/dkulp23/ways2go)
 [![Coverage Status](https://coveralls.io/repos/github/dkulp23/ways2go/badge.svg?branch=staging)](https://coveralls.io/github/dkulp23/ways2go?branch=staging)
 
+
 # Ways2Go
 Social networking rideshare solution for your daily commute.
 
