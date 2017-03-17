@@ -1,13 +1,14 @@
+[![Build Status](https://travis-ci.org/dkulp23/ways2go.svg?branch=master)](https://travis-ci.org/dkulp23/ways2go)
 [![Coverage Status](https://coveralls.io/repos/github/dkulp23/ways2go/badge.svg?branch=staging)](https://coveralls.io/github/dkulp23/ways2go?branch=staging)
 
 # ways2go
 Social networking rideshare solution for your daily commute.
 
-[Models](#MODELS) | [Routes](#ROUTES) | [About Us](#ABOUT)
+[Models](#models) | [Routes](#routes) | [About Us](#about-us)
 
 ***
 # **MODELS**
-[User](#User) | [Profile](Profile) | [Reviews](#Reviews) | [Ways](#Ways) | [Messages](#Messages) |
+[User](#user) | [Profile](#profile) | [Reviews](#reviews) | [Ways](#ways) | [Messages](#messages) |
 ***
 ### _User_
 This is the entry point for the ways2go interface. In order to interact with most of the features, each individual will be asked to provide a unique `username`, `password` and `email` address. This information will be stored securely and used to verify individuals each time they visit the site. ways2go leverages the [bcrypt](https://github.com/kelektiv/node.bcrypt.js) module to safely encrypt and match user passwords.
