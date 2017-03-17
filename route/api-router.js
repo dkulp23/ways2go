@@ -2,6 +2,13 @@
 
 const express = require('express');
 const path = require('path');
+const request = require('superagent');
+const showdown  = require('showdown');
+
+require('showdown-prettify');
+const converter = new showdown.Converter({ extensions: ['prettify'] });
+converter.setFlavor('github');
+
 
 const apiRouter = module.exports = express.Router();
 
@@ -44,5 +51,12 @@ apiRouter.use(express.static(path.join(__dirname, 'public')));
 apiRouter.get('/api', (req, res) => res.json(endpoints));
 
 apiRouter.get('/api/developer', (req, res) => {
-  res.sendFile('developer.html', { root: 'public'});
+  // res.sendFile('developer.html', { root: 'public'});
+  request.get('https://raw.githubusercontent.com/dkulp23/ways2go/staging/README.md')
+  .then( response => {
+    const input = response.text;
+    const html = converter.makeHtml(input);
+    res.send(html);
+  })
+  .catch(console.error);
 });
