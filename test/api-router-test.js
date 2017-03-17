@@ -28,7 +28,7 @@ describe('API Root Routes', function() {
       request.get(`${url}/api/developer`)
       .end((err, res) => {
         expect(res.status).to.equal(200);
-        expect(res.headers['content-type']).to.equal('text/html; charset=UTF-8');
+        expect(res.headers['content-type'].toLowerCase()).to.equal('text/html; charset=utf-8');
         done();
       });
     });

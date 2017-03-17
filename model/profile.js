@@ -2,7 +2,7 @@
 
 const debug = require('debug')('ways2go:profile');
 const mongoose = require('mongoose');
-const createError = require('http-errors');
+const createError = require('http-errors'); //eslint-disable-line
 const Schema = mongoose.Schema;
 
 const Review = require('../model/review.js');
@@ -28,7 +28,6 @@ Profile.findByIdAndAddReview = function(id, review) {
   debug('findByIdAndAddReview');
 
   return Profile.findById(id)
-  // .catch( err => Promise.reject(createError(404, err.message)))
   .then( profile => {
     review.reviewedUserID = profile._id;
     this.tempProfile = profile;

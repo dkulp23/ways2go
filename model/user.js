@@ -61,9 +61,6 @@ userSchema.methods.generateFindHash = function() {
       .then( () => resolve(this.findHash))
       .catch( err => {
         return reject(err);
-        // if (tries > 3) return reject(err);
-        // tries++;
-        // _generateFindHash.call(this);
       });
     }
   });
