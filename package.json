@@ -39,7 +39,7 @@
     "express": "^4.15.2",
     "http-errors": "^1.6.1",
     "jsonwebtoken": "^7.3.0",
-    "mongoose": "^4.8.7",
+    "mongoose": "^4.9.0",
     "mongoose-type-email": "^1.0.3",
     "morgan": "^1.8.1",
     "parse-address": "0.0.6",
