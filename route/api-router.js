@@ -20,29 +20,30 @@ const endpoints = {
     all_profiles_url: `${url}/api/profile`,
     way_url: `${url}/api/way/:id`,
     all_ways_url: `${url}/api/way`,
-    wayer_review_url: `${url}/api/wayerz/:wayerzID/review`,
+    review_url: `${url}/api/wayerz/:wayerzID/review`,
+    message_url: `${url}/api/message/:id`
   },
   POST: {
     user_signup_url: `${url}/api/signup`,
     profile_url: `${url}/api/profile`,
     way_url: `${url}/api/way`,
     add_wayer_to_way_url: `${url}/api/way/:wayID/wayerz/:wayerID`,
-    wayer_review_url: `${url}/api/wayerz/:wayerzID/review`,
-
+    review_url: `${url}/api/wayerz/:wayerzID/review`,
+    message_url: `${url}/api/profile/:profileID/message`
   },
   PUT: {
     way_url: `${url}/api/way/:id`,
     profile_url: `${url}/api/profile`,
-    wayer_review_url: `${url}/api/review/:id`,
-
+    review_url: `${url}/api/review/:id`,
+    message_url: `${url}/api/message/:id`
   },
   DELETE: {
     way_url: `${url}/api/way/:id`,
     profile_url: `${url}/api/profile`,
-    remove_wayer_url: `${url}/api/way/:wayID/wayerz/:wayerID`,
-    wayer_review_url: `${url}/api/review/:id`,
-
-  },
+    remove_wayer_from_way_url: `${url}/api/way/:wayID/wayerz/:wayerID`,
+    review_url: `${url}/api/review/:id`,
+    message_url: `${url}/api/message/:id`
+  }
 };
 
 
@@ -50,7 +51,7 @@ apiRouter.use(express.static(path.join(__dirname, 'public')));
 
 apiRouter.get('/api', (req, res) => res.json(endpoints));
 
-apiRouter.get('/api/developer', (req, res) => {
+apiRouter.get('/api/developer', (req, res, next) => {
   // res.sendFile('developer.html', { root: 'public'});
   request.get('https://raw.githubusercontent.com/dkulp23/ways2go/staging/README.md')
   .then( response => {
@@ -58,5 +59,5 @@ apiRouter.get('/api/developer', (req, res) => {
     const html = converter.makeHtml(input);
     res.send(html);
   })
-  .catch(console.error);
+  .catch(next);
 });
