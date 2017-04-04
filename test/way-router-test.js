@@ -50,8 +50,8 @@ const testLocation1 = '777 Seven st 77777';
 const testLocation2 = '11 eleven ave virginia beach,va 11111';
 
 const testWay = {
-  startLocation: '1234 1st ave 98765',
-  endLocation: '432 test st seattle, wa 56789'
+  startLocation: '3028 1st ave seattle',
+  endLocation: '841 manhattan ave hermosa beach'
 };
 
 describe('Way Routes', function() {
@@ -167,26 +167,21 @@ describe('Way Routes', function() {
           Authorization: `Bearer ${this.tempToken}`,
         })
         .end((err, res) => {
-          console.log('POST WAY REZZY'. res.body);
           if (err) return done(err);
           Way.findById(res.body._id)
           .populate('startLocationID')
           .populate('endLocationID')
           .then( way => {
             expect(res.status).to.equal(200);
-            // expect(res.body.profileID).to.equal(this.tempProfile._id.toString());
-            // expect(res.body.wayerz.length).to.equal(1);
-            // expect(res.body.wayerz[0]).to.equal(this.tempProfile._id.toString());
-            // expect(way.startLocationID.number).to.equal('1234');
-            // expect(way.startLocationID.street).to.equal('1st');
-            // expect(way.startLocationID.type).to.equal('ave');
-            // expect(way.startLocationID.zip).to.equal('98765');
-            // expect(way.endLocationID.number).to.equal('432');
-            // expect(way.endLocationID.street).to.equal('test');
-            // expect(way.endLocationID.type).to.equal('st');
-            // expect(way.endLocationID.city).to.equal('seattle');
-            // expect(way.endLocationID.state).to.equal('wa');
-            // expect(way.endLocationID.zip).to.equal('56789');
+            expect(res.body.profileID).to.equal(this.tempProfile._id.toString());
+            expect(res.body.wayerz.length).to.equal(1);
+            expect(res.body.wayerz[0]).to.equal(this.tempProfile._id.toString());
+            expect(way.startLocationID.number).to.equal('3028');
+            expect(way.startLocationID.zip).to.equal('98121');
+            expect(way.endLocationID.number).to.equal('841');
+            expect(way.endLocationID.city.toLowerCase()).to.equal('hermosa beach');
+            expect(way.endLocationID.state.toLowerCase()).to.equal('ca');
+            expect(way.endLocationID.zip).to.equal('90254');
             done();
           })
           .catch(done);

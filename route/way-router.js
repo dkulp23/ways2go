@@ -25,12 +25,12 @@ wayRouter.post('/api/way', bearerAuth, jsonParser, function(req, res, next) {
   if(!req.body.endLocation) return next(createError(400, 'end location required'));
 
   let promStart = parseLocationGoogle(req.body.startLocation)
-  .then( location => new Location(location).save())
+  .then( geolocation => new Location(geolocation).save())
   .then( location => {req.body.startLocationID = location._id;} )
   .catch(next);
 
   let promEnd = parseLocationGoogle(req.body.endLocation)
-  .then( location => new Location(location).save())
+  .then( geolocation => new Location(geolocation).save())
   .then( location => {req.body.endLocationID = location._id;} )
   .catch(next);
 
@@ -52,6 +52,7 @@ wayRouter.post('/api/way', bearerAuth, jsonParser, function(req, res, next) {
 
   Promise.all([ promStart, promEnd, promProfile ])
   .then( () => {
+    console.log('in promise all body', req.body);
     new Way(req.body).save()
     .then( way => {
       way.wayerz.push(way.profileID);
