@@ -7,9 +7,7 @@ const Promise = require('bluebird');
 const mongoose = require('mongoose');
 mongoose.Promise = Promise;
 
-//added parseGoogle
 const parseLocationGoogle = require('../lib/parse-location-google.js');
-
 const bearerAuth = require('../lib/bearer-auth-middleware.js');
 const Way = require('../model/way.js');
 const Profile = require('../model/profile.js');
