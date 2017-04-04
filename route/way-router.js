@@ -1,12 +1,15 @@
 'use strict';
 
 const debug = require('debug')('ways2go:way');
-const createError = require('http-errors'); //eslint-disable-line
+const createError = require('http-errors');
 const jsonParser = require('body-parser').json();
 const parseLocation = require('parse-address').parseLocation;
 const Promise = require('bluebird');
 const mongoose = require('mongoose');
 mongoose.Promise = Promise;
+
+//added parseGoogle
+const parseLocationGoogle = require('../lib/parse-location-google.js');
 
 const bearerAuth = require('../lib/bearer-auth-middleware.js');
 const Way = require('../model/way.js');
@@ -21,13 +24,25 @@ wayRouter.post('/api/way', bearerAuth, jsonParser, function(req, res, next) {
   if(!req.body.startLocation) return next(createError(400, 'start location required'));
   if(!req.body.endLocation) return next(createError(400, 'end location required'));
 
-  let promStart = new Location(parseLocation(req.body.startLocation)).save()
+  let promStart = parseLocationGoogle(req.body.startLocation)
+  .then( location => new Location(location).save())
   .then( location => {req.body.startLocationID = location._id;} )
   .catch(next);
 
-  let promEnd = new Location(parseLocation(req.body.endLocation)).save()
+  let promEnd = parseLocationGoogle(req.body.endLocation)
+  .then( location => new Location(location).save())
   .then( location => {req.body.endLocationID = location._id;} )
   .catch(next);
+
+  ////////////     BEFORE   //////////////////
+  // let promStart = new Location(parseLocation(req.body.startLocation)).save()
+  // .then( location => {req.body.startLocationID = location._id;} )
+  // .catch(next);
+
+  // let promEnd = new Location(parseLocation(req.body.endLocation)).save()
+  // .then( location => {req.body.endLocationID = location._id;} )
+  // .catch(next);
+  /////////////////////////////////////////////
 
   let promProfile = Profile.findOne({ userID: req.user._id })
   .then ( profile => {
