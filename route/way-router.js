@@ -39,7 +39,6 @@ wayRouter.post('/api/way', bearerAuth, jsonParser, function(req, res, next) {
 
   Promise.all([ promStart, promEnd, promProfile ])
   .then( () => {
-    console.log('in promise all body', req.body);
     new Way(req.body).save()
     .then( way => {
       way.wayerz.push(way.profileID);
