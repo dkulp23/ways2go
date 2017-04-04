@@ -358,22 +358,12 @@ describe('Way Routes', function() {
           expect(res.status).to.equal(200);
           expect(res.body).to.be.an('array');
           expect(res.body[0]._id).to.equal(this.tempWay._id.toString());
-          expect(res.body[0].startLocationID).to.equal(this.tempWay.startLocationID.toString());
-          expect(res.body[0].endLocationID).to.equal(this.tempWay.endLocationID.toString());
+          expect(res.body[0].startLocationID._id.toString()).to.equal(this.tempWay.startLocationID.toString());
+          expect(res.body[0].endLocationID._id.toString()).to.equal(this.tempWay.endLocationID.toString());
           done();
         });
       });
     });
-
-    // describe('with a unauth user', () => {
-    //   it('should return a 401', done => {
-    //     request.get(`${url}/api/way`)
-    //     .end((err, res) => {
-    //       expect(res.status).to.equal(401);
-    //       done();
-    //     });
-    //   });
-    // });
   });
 
   describe('PUT: /api/way/:id', () => {

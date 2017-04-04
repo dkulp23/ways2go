@@ -3,7 +3,6 @@
 const debug = require('debug')('ways2go:way');
 const createError = require('http-errors');
 const jsonParser = require('body-parser').json();
-const parseLocation = require('parse-address').parseLocation;
 const Promise = require('bluebird');
 const mongoose = require('mongoose');
 mongoose.Promise = Promise;
@@ -33,16 +32,6 @@ wayRouter.post('/api/way', bearerAuth, jsonParser, function(req, res, next) {
   .then( geolocation => new Location(geolocation).save())
   .then( location => {req.body.endLocationID = location._id;} )
   .catch(next);
-
-  ////////////     BEFORE   //////////////////
-  // let promStart = new Location(parseLocation(req.body.startLocation)).save()
-  // .then( location => {req.body.startLocationID = location._id;} )
-  // .catch(next);
-
-  // let promEnd = new Location(parseLocation(req.body.endLocation)).save()
-  // .then( location => {req.body.endLocationID = location._id;} )
-  // .catch(next);
-  /////////////////////////////////////////////
 
   let promProfile = Profile.findOne({ userID: req.user._id })
   .then ( profile => {
@@ -128,6 +117,9 @@ wayRouter.get('/api/way', function(req, res, next) {
   debug('GET: /api/way');
 
   Way.find({})
+  .populate('startLocationID')
+  .populate('endLocationID')
+  .populate('wayerz')
   .then( ways => res.json(ways))
   .catch(next);
 });
