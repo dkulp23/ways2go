@@ -368,7 +368,8 @@ describe('Way Routes', function() {
 
   describe('PUT: /api/way/:id', () => {
     let updateWay = {
-      startTime: 9 * 60 + 45, //minutes
+      'startTime.hour': 8,
+      'startTime.minutes': 15, //minutes
       recurringDayOfWeek: [ 0,1,2,3,4 ],
       startLocation: 'code fellows',
     };
@@ -380,10 +381,11 @@ describe('Way Routes', function() {
           Authorization: `Bearer ${this.tempToken}`,
         })
         .end((err, res) => {
+          console.log('res body', res.body);
           if (err) done(err);
           expect(res.status).to.equal(200);
           expect(res.body._id).to.equal(this.tempWay._id.toString());
-          expect(res.body.startTime).to.equal(updateWay.startTime);
+          expect(res.body.startTime.hour).to.equal(updateWay['startTime.hour']);
           expect(res.body).to.have.property('startTime');
           done();
         });
