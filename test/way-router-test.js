@@ -369,7 +369,8 @@ describe('Way Routes', function() {
   describe('PUT: /api/way/:id', () => {
     let updateWay = {
       startTime: 9 * 60 + 45, //minutes
-      recurringDayOfWeek: [ 0,1,2,3,4 ]
+      recurringDayOfWeek: [ 0,1,2,3,4 ],
+      startLocation: 'code fellows',
     };
     describe('with a valid id and request body', () => {
       it('should return an updated way', done => {

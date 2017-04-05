@@ -130,7 +130,34 @@ wayRouter.put('/api/way/:id', bearerAuth, jsonParser, function(req, res, next) {
     if (!Way.schema.paths[prop]) return next(createError(400, 'invalid request body'));
   }
 
-  Way.findByIdAndUpdate(req.params.id, req.body, { new: true })
+  let promStart = new Promise((resolve, reject) => {
+    if(req.body.startLocation) {
+      parseLocationGoogle(req.body.startLocation)
+      .then( geolocation => new Location(geolocation).save())
+      .then( location => {
+        req.body.startLocationID = location._id;
+        resolve();
+      })
+      .catch(reject);
+    }
+    resolve();
+  });
+
+  let promEnd = new Promise((resolve, reject) => {
+    if(req.body.endLocation) {
+      parseLocationGoogle(req.body.endLocation)
+      .then( geolocation => new Location(geolocation).save())
+      .then( location => {
+        req.body.endLocationID = location._id;
+        resolve();
+      })
+      .catch(reject);
+    }
+    resolve();
+  });
+
+  Promise.all([ promStart, promEnd ])
+  .then( () => Way.findByIdAndUpdate(req.params.id, req.body, { new: true }))
   .then( way => res.json(way))
   .catch(next);
 });
