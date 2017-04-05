@@ -108,8 +108,8 @@ describe('Review Routes', function() {
   beforeEach( done => {
     let tempWayObj = {
       profileID: this.tempProfile._id,
-      startLocationID: this.tempLocation1._id,
-      endLocationID: this.tempLocation2._id
+      startLocation: this.tempLocation1._id,
+      endLocation: this.tempLocation2._id
     };
     new Way(tempWayObj).save()
     .then( way => {

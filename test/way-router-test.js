@@ -130,8 +130,8 @@ describe('Way Routes', function() {
   beforeEach( done => {
     let tempWayObj = {
       profileID: this.tempProfile._id,
-      startLocationID: this.tempLocation1._id,
-      endLocationID: this.tempLocation2._id
+      startLocation: this.tempLocation1._id,
+      endLocation: this.tempLocation2._id
     };
     new Way(tempWayObj).save()
     .then( way => {
@@ -169,19 +169,19 @@ describe('Way Routes', function() {
         .end((err, res) => {
           if (err) return done(err);
           Way.findById(res.body._id)
-          .populate('startLocationID')
-          .populate('endLocationID')
+          .populate('startLocation')
+          .populate('endLocation')
           .then( way => {
             expect(res.status).to.equal(200);
             expect(res.body.profileID).to.equal(this.tempProfile._id.toString());
             expect(res.body.wayerz.length).to.equal(1);
             expect(res.body.wayerz[0]).to.equal(this.tempProfile._id.toString());
-            expect(way.startLocationID.number).to.equal('3028');
-            expect(way.startLocationID.zip).to.equal('98121');
-            expect(way.endLocationID.number).to.equal('841');
-            expect(way.endLocationID.city.toLowerCase()).to.equal('hermosa beach');
-            expect(way.endLocationID.state.toLowerCase()).to.equal('ca');
-            expect(way.endLocationID.zip).to.equal('90254');
+            expect(way.startLocation.number).to.equal('3028');
+            expect(way.startLocation.zip).to.equal('98121');
+            expect(way.endLocation.number).to.equal('841');
+            expect(way.endLocation.city.toLowerCase()).to.equal('hermosa beach');
+            expect(way.endLocation.state.toLowerCase()).to.equal('ca');
+            expect(way.endLocation.zip).to.equal('90254');
             done();
           })
           .catch(done);
@@ -325,8 +325,8 @@ describe('Way Routes', function() {
           if (err) done(err);
           expect(res.status).to.equal(200);
           expect(res.body._id).to.equal(this.tempWay._id.toString());
-          expect(res.body.startLocationID).to.have.property('street');
-          expect(res.body.endLocationID).to.have.property('street');
+          expect(res.body.startLocation).to.have.property('street');
+          expect(res.body.endLocation).to.have.property('street');
           done();
         });
       });
@@ -358,8 +358,8 @@ describe('Way Routes', function() {
           expect(res.status).to.equal(200);
           expect(res.body).to.be.an('array');
           expect(res.body[0]._id).to.equal(this.tempWay._id.toString());
-          expect(res.body[0].startLocationID._id.toString()).to.equal(this.tempWay.startLocationID.toString());
-          expect(res.body[0].endLocationID._id.toString()).to.equal(this.tempWay.endLocationID.toString());
+          expect(res.body[0].startLocation._id.toString()).to.equal(this.tempWay.startLocation.toString());
+          expect(res.body[0].endLocation._id.toString()).to.equal(this.tempWay.endLocation.toString());
           done();
         });
       });

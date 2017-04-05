@@ -8,8 +8,8 @@ const Schema = mongoose.Schema;
 mongoose.Promise = Promise;
 
 const waySchema = Schema({
-  startLocationID: { type: Schema.Types.ObjectId, ref:'location', required: true },
-  endLocationID: { type: Schema.Types.ObjectId, ref:'location', required: true },
+  startLocation: { type: Schema.Types.ObjectId, ref:'location', required: true },
+  endLocation: { type: Schema.Types.ObjectId, ref:'location', required: true },
   profileID: { type: Schema.Types.ObjectId, required: true },
   wayerz: [{ type: Schema.Types.ObjectId , ref:'profile'}],
   timestamp: { type: Date, default: Date.now },
