@@ -8,6 +8,7 @@ const Schema = mongoose.Schema;
 mongoose.Promise = Promise;
 
 const waySchema = Schema({
+  name: { type: String },
   startLocation: { type: Schema.Types.ObjectId, ref:'location', required: true },
   endLocation: { type: Schema.Types.ObjectId, ref:'location', required: true },
   profileID: { type: Schema.Types.ObjectId, required: true },
