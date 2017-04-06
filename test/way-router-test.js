@@ -176,7 +176,6 @@ describe('Way Routes', function() {
             expect(res.body.profileID).to.equal(this.tempProfile._id.toString());
             expect(res.body.wayerz.length).to.equal(1);
             expect(res.body.wayerz[0]).to.equal(this.tempProfile._id.toString());
-            expect(way.startLocation.number).to.equal('3028');
             expect(way.startLocation.zip).to.equal('98121');
             expect(way.endLocation.number).to.equal('841');
             expect(way.endLocation.city.toLowerCase()).to.equal('hermosa beach');

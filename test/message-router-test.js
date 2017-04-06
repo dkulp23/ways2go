@@ -44,6 +44,10 @@ const testMessage = {
   text: 'Make it rain!'
 };
 
+const testMessage2 = {
+  text: 'ayo!'
+};
+
 describe('Message Routes', function() {
   beforeEach( done => {
     new User(testUser)
@@ -100,12 +104,27 @@ describe('Message Routes', function() {
     let message = {
       toProfileID: this.tempProfile2._id,
       fromProfileID: this.tempProfile._id,
-      text: 'holla'
+      text: 'ayo from 1 to 2',
     };
 
     new Message(message).save()
     .then(message => {
       this.tempMessage = message;
+      done();
+    })
+    .catch(done);
+  });
+
+  beforeEach( done => {
+    let message = {
+      toProfileID: this.tempProfile._id,
+      fromProfileID: this.tempProfile2._id,
+      text: 'holla from 2 to 1',
+    };
+
+    new Message(message).save()
+    .then(message => {
+      this.tempMessage2 = message;
       done();
     })
     .catch(done);
@@ -172,6 +191,22 @@ describe('Message Routes', function() {
         .end((err, res) => {
           expect(err).to.be.an('error');
           expect(res.status).to.equal(404);
+          done();
+        });
+      });
+    });
+  });
+
+  describe('GET: /api/message', () => {
+    describe('from an authorized user', () => {
+      it('should return all incoming and sent messages', done => {
+        request.get(`${url}/api/message`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`
+        })
+        .end((err, res) => {
+          console.log('all messages', res.body);
+          expect(res.status).to.equal(200);
           done();
         });
       });

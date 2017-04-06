@@ -46,6 +46,20 @@ messageRouter.get('/api/message/:id', bearerAuth, jsonParser, function(req, res,
     .catch(next);
 });
 
+messageRouter.get('/api/message', bearerAuth, jsonParser, function(req, res, next) {
+  debug('GET: /api/message');
+
+  Profile.findOne({userID:req.user._id })
+  .then( profile => {
+    return Message.find( { $or:[{ toProfileID: profile._id },{ fromProfileID: profile._id }] })
+  })
+  .then( messages => {
+    res.json(messages);
+  })
+  .catch(next);
+});
+
+
   messageRouter.put('/api/message/:id', bearerAuth, jsonParser, function(req, res, next) {
     debug('PUT: /api/message/:id');
 
