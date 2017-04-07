@@ -31,7 +31,7 @@ wayRouter.post('/api/way', bearerAuth, jsonParser, function(req, res, next) {
   .then( location => {req.body.endLocation = location._id;} )
   .catch(next);
 
-  let promProfile = Profile.findOne({ userID: req.user._id })
+  let promProfile = Profile.findOne({ profileID: req.user._id })
   .then ( profile => {
     req.body.profileID = profile._id;
   })
@@ -61,7 +61,7 @@ wayRouter.post('/api/way/:wayID/wayerz/:wayerID', bearerAuth, function(req, res,
   })
   .then( way => {
     tempWay = way;
-    return Profile.findOne({ userID: req.user._id.toString() });
+    return Profile.findOne({ profileID: req.user._id.toString() });
   })
   .then( profile => {
     if (profile._id.toString() !== tempWay.profileID.toString()) return next(createError(401, 'not owner of way'));
@@ -85,7 +85,7 @@ wayRouter.delete('/api/way/:wayID/wayerz/:wayerID', bearerAuth, function(req, re
   })
   .then( way => {
     tempWay = way;
-    return Profile.findOne({ userID: req.user._id.toString() });
+    return Profile.findOne({ profileID: req.user._id.toString() });
   })
   .then( profile => {
     if (profile._id.toString() !== tempWay.profileID.toString()) return next(createError(401, 'not owner of way'));

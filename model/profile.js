@@ -8,7 +8,7 @@ const Schema = mongoose.Schema;
 const Review = require('../model/review.js');
 
 const profileSchema = Schema({
-  userID: { type: Schema.Types.ObjectId, required: true },
+  profileID: { type: Schema.Types.ObjectId, required: true },
   displayName: { type: String, required: true, unique: true },
   fullName: { type: String },
   address: { type: String },
@@ -27,9 +27,11 @@ const Profile = module.exports = mongoose.model('profile', profileSchema);
 Profile.findByIdAndAddReview = function(id, review) {
   debug('findByIdAndAddReview');
 
+  console.log('review in findbyprofileid', review);
+
   return Profile.findById(id)
   .then( profile => {
-    review.reviewedUserID = profile._id;
+    review.reviewedprofileID = profile._id;
     this.tempProfile = profile;
     return new Review(review).save();
   })

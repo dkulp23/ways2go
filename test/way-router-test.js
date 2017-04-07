@@ -74,7 +74,7 @@ describe('Way Routes', function() {
 
   beforeEach( done => {
     this.tempProfile = testProfile;
-    this.tempProfile.userID = this.tempUser._id;
+    this.tempProfile.profileID = this.tempUser._id;
     new Profile(testProfile).save()
     .then( profile => {
       this.tempProfile = profile;
@@ -100,7 +100,7 @@ describe('Way Routes', function() {
 
   beforeEach( done => {
     this.tempProfile2 = testProfile2;
-    this.tempProfile2.userID = this.tempUser2._id;
+    this.tempProfile2.profileID = this.tempUser2._id;
     new Profile(testProfile2).save()
     .then( profile => {
       this.tempProfile2 = profile;
@@ -152,7 +152,7 @@ describe('Way Routes', function() {
   });
 
   afterEach( done => {
-    delete this.tempProfile.userID;
+    delete this.tempProfile.profileID;
     done();
   });
 

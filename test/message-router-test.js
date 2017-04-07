@@ -65,7 +65,7 @@ describe('Message Routes', function() {
   });
 
   beforeEach( done => {
-    testProfile.userID = this.tempUser._id;
+    testProfile.profileID = this.tempUser._id;
     new Profile(testProfile).save()
     .then( profile => {
       this.tempProfile = profile;
@@ -90,7 +90,7 @@ describe('Message Routes', function() {
   });
 
   beforeEach( done => {
-    testProfile2.userID = this.tempUser2._id;
+    testProfile2.profileID = this.tempUser2._id;
     new Profile(testProfile2).save()
       .then( profile => {
         this.tempProfile2 = profile;

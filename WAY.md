@@ -72,7 +72,7 @@ Example
             "displayName": "ayowayer",
             "reviews": [],
             "timeStamp": "2017-03-17T03:13:45.018Z",
-            "userID": "58cb4aaddb9f2e0011bc74b3"
+            "profileID": "58cb4aaddb9f2e0011bc74b3"
         }
     ]
 }

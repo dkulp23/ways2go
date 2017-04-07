@@ -82,7 +82,7 @@ describe('Profile Routes', function() {
           if (err) return done(err);
           expect(res.status).to.equal(200);
           expect(res.body.displayName).to.equal(testProfile.displayName);
-          expect(res.body.userID).to.equal(this.tempUser._id.toString());
+          expect(res.body.profileID).to.equal(this.tempUser._id.toString());
           done();
         });
       });
@@ -135,7 +135,7 @@ describe('Profile Routes', function() {
     });
 
     beforeEach( done => {
-      testProfile.userID = this.tempUser._id.toString();
+      testProfile.profileID = this.tempUser._id.toString();
       new Profile(testProfile).save()
       .then( profile => {
         this.tempProfile = profile;
@@ -145,7 +145,7 @@ describe('Profile Routes', function() {
     });
 
     afterEach( () => {
-      delete testProfile.userID;
+      delete testProfile.profileID;
     });
 
     describe('with a valid request', () => {
@@ -206,7 +206,7 @@ describe('Profile Routes', function() {
     });
 
     beforeEach( done => {
-      testProfile.userID = this.tempUser._id.toString();
+      testProfile.profileID = this.tempUser._id.toString();
       new Profile(testProfile).save()
       .then( profile => {
         this.tempProfile = profile;
@@ -216,7 +216,7 @@ describe('Profile Routes', function() {
     });
 
     afterEach( () => {
-      delete testProfile.userID;
+      delete testProfile.profileID;
     });
 
     describe('with a valid request', () => {
@@ -286,7 +286,7 @@ describe('Profile Routes', function() {
     });
 
     beforeEach( done => {
-      testProfile.userID = this.tempUser._id.toString();
+      testProfile.profileID = this.tempUser._id.toString();
       new Profile(testProfile).save()
       .then( profile => {
         this.tempProfile = profile;
@@ -311,7 +311,7 @@ describe('Profile Routes', function() {
     });
 
     beforeEach( done => {
-      otherProfile.userID = this.tempUser._id.toString();
+      otherProfile.profileID = this.tempUser._id.toString();
       new Profile(otherProfile).save()
       .then( profile => {
         this.tempProfileTwo = profile;
@@ -332,8 +332,8 @@ describe('Profile Routes', function() {
     });
 
     afterEach( done => {
-      delete testProfile.userID;
-      delete otherProfile.userID;
+      delete testProfile.profileID;
+      delete otherProfile.profileID;
       Message.remove({})
       .then( () => done())
       .catch(done);
@@ -386,7 +386,7 @@ describe('Profile Routes', function() {
     });
 
     beforeEach( done => {
-      testProfile.userID = this.tempUser._id.toString();
+      testProfile.profileID = this.tempUser._id.toString();
       new Profile(testProfile).save()
       .then( profile => {
         this.tempProfile = profile;
@@ -411,7 +411,7 @@ describe('Profile Routes', function() {
     });
 
     beforeEach( done => {
-      otherProfile.userID = this.tempUserTwo._id.toString();
+      otherProfile.profileID = this.tempUserTwo._id.toString();
       new Profile(otherProfile).save()
       .then( profile => {
         this.tempProfileTwo = profile;
@@ -421,8 +421,8 @@ describe('Profile Routes', function() {
     });
 
     afterEach( () => {
-      delete testProfile.userID;
-      delete otherProfile.userID;
+      delete testProfile.profileID;
+      delete otherProfile.profileID;
     });
 
     describe('with a valid request', () => {

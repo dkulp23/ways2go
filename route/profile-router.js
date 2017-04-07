@@ -14,7 +14,7 @@ const profileRouter = module.exports = Router();
 profileRouter.post('/api/profile', bearerAuth, jsonParser, function(req, res, next) {
   debug('POST: /api/profile');
 
-  req.body.userID = req.user._id;
+  req.body.profileID = req.user._id;
   new Profile(req.body).save()
   .then( profile => res.json(profile))
   .catch(next);
@@ -46,7 +46,7 @@ profileRouter.get('/api/profile', bearerAuth, function(req, res, next) {
 profileRouter.put('/api/profile', bearerAuth, jsonParser, function(req, res, next) {
   debug('PUT: /api/profile');
 
-  Profile.findOneAndUpdate({ userID: req.user._id }, req.body, { new: true })
+  Profile.findOneAndUpdate({ profileID: req.user._id }, req.body, { new: true })
   .then( profile => {
     let reqKeys = Object.keys(req.body);
     if (!profile[reqKeys]) return next(createError(400, 'bad request'));
@@ -58,7 +58,7 @@ profileRouter.put('/api/profile', bearerAuth, jsonParser, function(req, res, nex
 profileRouter.delete('/api/profile', bearerAuth, function(req, res, next) {
   debug('DELETE: /api/profile');
 
-  Profile.findOneAndRemove({ userID: req.user._id })
+  Profile.findOneAndRemove({ profileID: req.user._id })
   .then( deleted => {
     if (!deleted) return next(createError(404, 'profile not found'));
     deleted.remove();

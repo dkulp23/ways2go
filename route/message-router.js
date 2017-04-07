@@ -15,7 +15,7 @@ const messageRouter = module.exports = Router();
 messageRouter.post('/api/profile/:profileID/message', bearerAuth, jsonParser, function(req, res, next) {
   debug('POST: /api/profile/:profileID/message');
 
-  Profile.findOne({ userID: req.user._id })
+  Profile.findOne({ profileID: req.user._id })
   .then( profile => {
 
     req.body.fromProfileID = profile._id;
@@ -32,7 +32,7 @@ messageRouter.post('/api/profile/:profileID/message', bearerAuth, jsonParser, fu
 messageRouter.get('/api/message/:id', bearerAuth, jsonParser, function(req, res, next) {
   debug('GET: /api/message/:id');
 
-  Profile.findOne({userID:req.user._id })
+  Profile.findOne({profileID:req.user._id })
 .then(profile => {
 
   Message.findById( req.params.id)
@@ -49,7 +49,7 @@ messageRouter.get('/api/message/:id', bearerAuth, jsonParser, function(req, res,
 messageRouter.get('/api/message', bearerAuth, jsonParser, function(req, res, next) {
   debug('GET: /api/message');
 
-  Profile.findOne({userID:req.user._id })
+  Profile.findOne({profileID:req.user._id })
   .then( profile => {
     return Message.find( { $or:[{ toProfileID: profile._id },{ fromProfileID: profile._id }] })
   })
@@ -71,7 +71,7 @@ messageRouter.get('/api/message', bearerAuth, jsonParser, function(req, res, nex
 
     let tempProfile;
 
-    Profile.findOne({userID:req.user._id })
+    Profile.findOne({profileID:req.user._id })
 .then( profile => {
   tempProfile = profile;
   return Message.findById(req.params.id);
@@ -97,7 +97,7 @@ messageRouter.get('/api/message', bearerAuth, jsonParser, function(req, res, nex
 
     let tempProfile;
 
-    Profile.findOne({userID:req.user._id })
+    Profile.findOne({profileID:req.user._id })
 .then( profile => {
   tempProfile = profile;
   return Message.findById(req.params.id);
