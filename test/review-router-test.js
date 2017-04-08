@@ -32,7 +32,7 @@ const mocUser2 = {
 const mocProfile = {
   displayName: 'mocdisplayname',
   fullName: 'Test Name',
-  address: 'moc address',
+  address: '111222333444555666777888',
   bio: 'moc bio',
   avgRating: 3
 };

@@ -391,6 +391,7 @@ describe('Profile Routes', function() {
 
     beforeEach( done => {
       testProfile.profileID = this.tempUser._id.toString();
+      testProfile.address = '111222333444555666777888';
       new Profile(testProfile).save()
       .then( profile => {
         this.tempProfile = profile;
@@ -416,6 +417,7 @@ describe('Profile Routes', function() {
 
     beforeEach( done => {
       otherProfile.profileID = this.tempUserTwo._id.toString();
+      otherProfile.address = '222333444555666777888999';
       new Profile(otherProfile).save()
       .then( profile => {
         this.tempProfileTwo = profile;

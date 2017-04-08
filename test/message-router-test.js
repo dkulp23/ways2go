@@ -23,7 +23,7 @@ const testUser = {
 const testProfile = {
   displayName: 'testingonetwo',
   fullName: 'Mr. Test User',
-  address: '2901 3rd Ave, Seattle, WA 98121',
+  address: '111222333444555666777888',
   bio: 'Can\'t wait to meet my new best friend on ways2go!'
 };
 
@@ -36,7 +36,7 @@ const testUser2 = {
 const testProfile2 = {
   displayName: 'testingonetwo3',
   fullName: 'Mr. Test User',
-  address: '2901 3rd Ave, Seattle, WA 98121',
+  address: '222333444555666777888999',
   bio: 'Can\'t wait to meet my new best friend on ways2go!'
 };
 

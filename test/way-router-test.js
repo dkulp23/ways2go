@@ -27,7 +27,7 @@ const testUser = {
 const testProfile = {
   displayName: 'testdisplayname',
   fullName: 'Test Name',
-  address: 'test address',
+  address: '111222333444555666777888',
   bio: 'test bio',
   avgRating: 3,
 };
@@ -41,7 +41,7 @@ const testUser2 = {
 const testProfile2 = {
   displayName: 'test2displayname',
   fullName: 'Test Name2',
-  address: 'test 2address',
+  address: '222333444555666777888999',
   bio: 'test2 bio',
   avgRating: 4,
 };
