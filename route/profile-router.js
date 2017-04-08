@@ -34,7 +34,6 @@ profileRouter.get('/api/profile/:id', bearerAuth, function(req, res, next) {
   .populate('reviews')
   .populate('address')
   .then( profile => {
-    console.log('profile', profile);
     if (!profile) return next(createError(404, 'Profile Not Found'));
     res.json(profile);
   })
@@ -55,13 +54,27 @@ profileRouter.get('/api/profile', bearerAuth, function(req, res, next) {
 profileRouter.put('/api/profile', bearerAuth, jsonParser, function(req, res, next) {
   debug('PUT: /api/profile');
 
+  let reqKeys = Object.keys(req.body);
+
+  if (reqKeys.includes('address')) {
+    parseLocationGoogle(req.body.address)
+    .then( geolocation => {
+      return new Location(geolocation).save();
+    })
+    .then( location => {
+      req.body.address = location._id;
+      return Profile.findOneAndUpdate({ profileID: req.user._id }, req.body, { new: true });
+    })
+    .then( profile => res.json(profile))
+    .catch(next);
+    return;
+  }
   Profile.findOneAndUpdate({ profileID: req.user._id }, req.body, { new: true })
   .then( profile => {
-    let reqKeys = Object.keys(req.body);
     if (!profile[reqKeys]) return next(createError(400, 'bad request'));
     res.json(profile);
   })
-  .catch(next);
+  .catch(next);  
 });
 
 profileRouter.delete('/api/profile', bearerAuth, function(req, res, next) {

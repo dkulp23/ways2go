@@ -8,6 +8,9 @@ const Promise = require('bluebird');
 const User = require('../model/user.js');
 const Profile = require('../model/profile.js');
 const Message = require('../model/message.js');
+const Location = require('../model/location.js');
+const parseLocationGoogle = require('../lib/parse-location-google.js');
+
 
 mongoose.Promise = Promise;
 
@@ -49,7 +52,8 @@ describe('Profile Routes', function() {
   afterEach( done => {
     Promise.all([
       User.remove({}),
-      Profile.remove({})
+      Profile.remove({}),
+      Location.remove({})
     ])
     .then( () => done())
     .catch(done);
@@ -209,6 +213,7 @@ describe('Profile Routes', function() {
 
     beforeEach( done => {
       testProfile.profileID = this.tempUser._id.toString();
+      testProfile.address = '111222333444555666777888';
       new Profile(testProfile).save()
       .then( profile => {
         this.tempProfile = profile;
@@ -228,12 +233,18 @@ describe('Profile Routes', function() {
           Authorization: `Bearer ${this.tempToken}`
         })
         .send({
-          displayName: 'cooldisplayname'
+          displayName: 'cooldisplayname',
+          address: '3636 Evanston Ave N, Seattle, WA 98103'
         })
         .end((err, res) => {
           if (err) return done(err);
           expect(res.status).to.equal(200);
           expect(res.body.displayName).to.equal('cooldisplayname');
+          Location.find({ fullAddress: /3636 Evanston Ave N/i })
+          .then( location => {
+            expect(location).to.not.be.null;
+          })
+          .catch(done);
           done();
         });
       });

@@ -44,7 +44,7 @@ const testMessage = {
   text: 'Make it rain!'
 };
 
-const testMessage2 = {
+const testMessage2 = { //eslint-disable-line
   text: 'ayo!'
 };
 
