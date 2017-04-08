@@ -111,7 +111,8 @@ describe('Profile Routes', function() {
         })
         .end((err, res) => {
           expect(err.status).to.equal(400);
-          expect(res.text).to.equal('BadRequestError');
+          expect(err.message).to.equal('Bad Request');
+          expect(res.text).to.equal('Error');
           done();
         });
       });
@@ -136,6 +137,7 @@ describe('Profile Routes', function() {
 
     beforeEach( done => {
       testProfile.profileID = this.tempUser._id.toString();
+      testProfile.address = '111222333444555666777888';
       new Profile(testProfile).save()
       .then( profile => {
         this.tempProfile = profile;
@@ -287,6 +289,7 @@ describe('Profile Routes', function() {
 
     beforeEach( done => {
       testProfile.profileID = this.tempUser._id.toString();
+      testProfile.address = '111222333444555666777888';
       new Profile(testProfile).save()
       .then( profile => {
         this.tempProfile = profile;
@@ -312,6 +315,7 @@ describe('Profile Routes', function() {
 
     beforeEach( done => {
       otherProfile.profileID = this.tempUser._id.toString();
+      otherProfile.address = '222333444555666777888999';
       new Profile(otherProfile).save()
       .then( profile => {
         this.tempProfileTwo = profile;

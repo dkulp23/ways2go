@@ -11,7 +11,7 @@ const profileSchema = Schema({
   profileID: { type: Schema.Types.ObjectId, required: true },
   displayName: { type: String, required: true, unique: true },
   fullName: { type: String },
-  address: { type: String },
+  address: [{ type: Schema.Types.ObjectId, ref: 'location' }],
   bio: { type: String },
   avgRating: { type: Number },
   timeStamp: { type: Date, default: Date.now },

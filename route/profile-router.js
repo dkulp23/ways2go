@@ -7,7 +7,8 @@ const debug = require('debug')('ways2go:profile-router');
 
 const bearerAuth = require('../lib/bearer-auth-middleware.js');
 const Profile = require('../model/profile.js');
-
+const Location = require('../model/location.js');
+const parseLocationGoogle = require('../lib/parse-location-google.js');
 
 const profileRouter = module.exports = Router();
 
@@ -15,7 +16,13 @@ profileRouter.post('/api/profile', bearerAuth, jsonParser, function(req, res, ne
   debug('POST: /api/profile');
 
   req.body.profileID = req.user._id;
-  new Profile(req.body).save()
+
+  parseLocationGoogle(req.body.address)
+  .then( geolocation => new Location(geolocation).save())
+  .then( location => {
+    req.body.address = location._id;
+    return new Profile(req.body).save();
+  })
   .then( profile => res.json(profile))
   .catch(next);
 });
@@ -25,7 +32,9 @@ profileRouter.get('/api/profile/:id', bearerAuth, function(req, res, next) {
 
   Profile.findById(req.params.id)
   .populate('reviews')
+  .populate('address')
   .then( profile => {
+    console.log('profile', profile);
     if (!profile) return next(createError(404, 'Profile Not Found'));
     res.json(profile);
   })
