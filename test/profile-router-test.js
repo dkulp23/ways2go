@@ -9,8 +9,6 @@ const User = require('../model/user.js');
 const Profile = require('../model/profile.js');
 const Message = require('../model/message.js');
 const Location = require('../model/location.js');
-const parseLocationGoogle = require('../lib/parse-location-google.js');
-
 
 mongoose.Promise = Promise;
 

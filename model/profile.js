@@ -13,9 +13,14 @@ const profileSchema = Schema({
   fullName: { type: String },
   address: [{ type: Schema.Types.ObjectId, ref: 'location' }],
   bio: { type: String },
-  avgRating: { type: Number },
   timeStamp: { type: Date, default: Date.now },
-  reviews: [{ type: Schema.Types.ObjectId, ref: 'review' }]
+  reviews: [{ type: Schema.Types.ObjectId, ref: 'review' }],
+  socialMedia: {
+    facebook: { type: String },
+    twitter: { type: String },
+    snapChat: { type: String },
+    linkedIn: { type: String }
+  }
 });
 
 profileSchema.pre('remove', function(next) {
@@ -26,8 +31,6 @@ const Profile = module.exports = mongoose.model('profile', profileSchema);
 
 Profile.findByIdAndAddReview = function(id, review) {
   debug('findByIdAndAddReview');
-
-  console.log('review in findbyprofileid', review);
 
   return Profile.findById(id)
   .then( profile => {
