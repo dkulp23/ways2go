@@ -371,6 +371,13 @@ describe('Way Routes', function() {
       'startTime.minutes': 15, //minutes
       recurringDayOfWeek: [ 0,1,2,3,4 ],
       startLocation: 'code fellows',
+      endLocation: 'space needle'
+    };
+
+    let updateWayNoLocation = {
+      'startTime.hour': 8,
+      'startTime.minutes': 15, //minutes
+      recurringDayOfWeek: [ 0,1,2,3,4 ],
     };
     describe('with a valid id and request body', () => {
       it('should return an updated way', done => {
@@ -380,11 +387,28 @@ describe('Way Routes', function() {
           Authorization: `Bearer ${this.tempToken}`,
         })
         .end((err, res) => {
-          console.log('res body', res.body);
           if (err) done(err);
           expect(res.status).to.equal(200);
           expect(res.body._id).to.equal(this.tempWay._id.toString());
           expect(res.body.startTime.hour).to.equal(updateWay['startTime.hour']);
+          expect(res.body).to.have.property('startTime');
+          done();
+        });
+      });
+    });
+
+    describe('with a valid id and request body', () => {
+      it('should return an updated way', done => {
+        request.put(`${url}/api/way/${this.tempWay._id}`)
+        .send(updateWayNoLocation)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`,
+        })
+        .end((err, res) => {
+          if (err) done(err);
+          expect(res.status).to.equal(200);
+          expect(res.body._id).to.equal(this.tempWay._id.toString());
+          expect(res.body.startTime.hour).to.equal(updateWayNoLocation['startTime.hour']);
           expect(res.body).to.have.property('startTime');
           done();
         });
