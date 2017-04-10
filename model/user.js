@@ -12,11 +12,16 @@ require('mongoose-type-email');
 const Schema = mongoose.Schema;
 
 const userSchema = Schema({
-  username: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  email: { type: mongoose.SchemaTypes.Email, required: true, unique: true },
+  // username: { type: String, required: true, unique: true },
+  // password: { type: String, required: true },
+  // email: { type: mongoose.SchemaTypes.Email, required: true, unique: true },
+  username: { type: String, unique: true },
+  password: { type: String },
+  email: { type: mongoose.SchemaTypes.Email, unique: true },
   timeStamp: { type: Date, default: Date.now },
-  findHash: { type: String, unique: true }
+  findHash: { type: String, unique: true },
+  provider: { type: String },
+
 });
 
 userSchema.methods.generatePasswordHash = function(password) {
