@@ -7,15 +7,22 @@ const debug = require('debug')('ways2go:profile-router');
 
 const bearerAuth = require('../lib/bearer-auth-middleware.js');
 const Profile = require('../model/profile.js');
-
+const Location = require('../model/location.js');
+const parseLocationGoogle = require('../lib/parse-location-google.js');
 
 const profileRouter = module.exports = Router();
 
 profileRouter.post('/api/profile', bearerAuth, jsonParser, function(req, res, next) {
   debug('POST: /api/profile');
 
-  req.body.userID = req.user._id;
-  new Profile(req.body).save()
+  req.body.profileID = req.user._id;
+
+  parseLocationGoogle(req.body.address)
+  .then( geolocation => new Location(geolocation).save())
+  .then( location => {
+    req.body.address = location._id;
+    return new Profile(req.body).save();
+  })
   .then( profile => res.json(profile))
   .catch(next);
 });
@@ -25,6 +32,7 @@ profileRouter.get('/api/profile/:id', bearerAuth, function(req, res, next) {
 
   Profile.findById(req.params.id)
   .populate('reviews')
+  .populate('address')
   .then( profile => {
     if (!profile) return next(createError(404, 'Profile Not Found'));
     res.json(profile);
@@ -46,19 +54,33 @@ profileRouter.get('/api/profile', bearerAuth, function(req, res, next) {
 profileRouter.put('/api/profile', bearerAuth, jsonParser, function(req, res, next) {
   debug('PUT: /api/profile');
 
-  Profile.findOneAndUpdate({ userID: req.user._id }, req.body, { new: true })
+  let reqKeys = Object.keys(req.body);
+
+  if (reqKeys.includes('address')) {
+    parseLocationGoogle(req.body.address)
+    .then( geolocation => {
+      return new Location(geolocation).save();
+    })
+    .then( location => {
+      req.body.address = location._id;
+      return Profile.findOneAndUpdate({ profileID: req.user._id }, req.body, { new: true });
+    })
+    .then( profile => res.json(profile))
+    .catch(next);
+    return;
+  }
+  Profile.findOneAndUpdate({ profileID: req.user._id }, req.body, { new: true })
   .then( profile => {
-    let reqKeys = Object.keys(req.body);
     if (!profile[reqKeys]) return next(createError(400, 'bad request'));
     res.json(profile);
   })
-  .catch(next);
+  .catch(next);  
 });
 
 profileRouter.delete('/api/profile', bearerAuth, function(req, res, next) {
   debug('DELETE: /api/profile');
 
-  Profile.findOneAndRemove({ userID: req.user._id })
+  Profile.findOneAndRemove({ profileID: req.user._id })
   .then( deleted => {
     if (!deleted) return next(createError(404, 'profile not found'));
     deleted.remove();

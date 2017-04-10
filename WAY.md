@@ -20,8 +20,8 @@ If successful, `res.status` will be `200` and `res.body` will be the Way that wa
 Example
 ```json
 { "profileID": "58cb5469422bbb001115c74f",
-  "startLocationID": "58cb6af2422bbb001115c758",
-  "endLocationID": "58cb6af2422bbb001115c759",
+  "startLocation": "58cb6af2422bbb001115c758",
+  "endLocation": "58cb6af2422bbb001115c759",
   "_id": "58cb6af2422bbb001115c75a",
   "recurringDayOfWeek": [],
   "timestamp": "2017-03-17T04:49:54.925Z",
@@ -39,7 +39,7 @@ Example
 {
     "__v": 1,
     "_id": "58cb6af2422bbb001115c75a",
-    "endLocationID": {
+    "endLocation": {
         "__v": 0,
         "_id": "58cb6af2422bbb001115c759",
         "city": "Seattle",
@@ -52,7 +52,7 @@ Example
     },
     "profileID": "58cb5469422bbb001115c74f",
     "recurringDayOfWeek": [],
-    "startLocationID": {
+    "startLocation": {
         "__v": 0,
         "_id": "58cb6af2422bbb001115c758",
         "city": "Seattle",
@@ -72,7 +72,7 @@ Example
             "displayName": "ayowayer",
             "reviews": [],
             "timeStamp": "2017-03-17T03:13:45.018Z",
-            "userID": "58cb4aaddb9f2e0011bc74b3"
+            "profileID": "58cb4aaddb9f2e0011bc74b3"
         }
     ]
 }
@@ -100,8 +100,8 @@ Example
 ```json
 { "_id":"58cb6af2422bbb001115c75a",
   "profileID":"58cb5469422bbb001115c74f",
-  "startLocationID":"58cb6af2422bbb001115c758",
-  "endLocationID":"58cb6af2422bbb001115c759",
+  "startLocation":"58cb6af2422bbb001115c758",
+  "endLocation":"58cb6af2422bbb001115c759",
   "__v":1,
   "startTime":630,
   "recurringDayOfWeek":[1,2,3]
@@ -132,8 +132,8 @@ Example
 ```json
 { "_id":"58cb6af2422bbb001115c75a",
   "profileID":"58cb5469422bbb001115c74f",
-  "startLocationID":"58cb6af2422bbb001115c758",
-  "endLocationID":"58cb6af2422bbb001115c759",
+  "startLocation":"58cb6af2422bbb001115c758",
+  "endLocation":"58cb6af2422bbb001115c759",
   "__v":2,
   "startTime":630,
   "recurringDayOfWeek":[1,2,3],
@@ -152,8 +152,8 @@ Example
 ```json
 { "_id":"58cb6af2422bbb001115c75a",
   "profileID":"58cb5469422bbb001115c74f",
-  "startLocationID":"58cb6af2422bbb001115c758",
-  "endLocationID":"58cb6af2422bbb001115c759",
+  "startLocation":"58cb6af2422bbb001115c758",
+  "endLocation":"58cb6af2422bbb001115c759",
   "__v":2,
   "startTime":630,
   "recurringDayOfWeek":[1,2,3],

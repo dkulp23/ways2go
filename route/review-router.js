@@ -14,7 +14,7 @@ const reviewRouter = module.exports = Router();
 reviewRouter.post('/api/wayerz/:wayerzID/review', bearerAuth, jsonParser, function(req, res, next) {
   debug('POST: /api/wayerz/:wayerzID/review');
 
-  req.body.userID = req.user._id;
+  req.body.profileID = req.user._id;
 
   Profile.findByIdAndAddReview(req.params.wayerzID, req.body)
   .then( review => res.json(review))

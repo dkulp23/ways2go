@@ -13,7 +13,8 @@ const Location = require('../model/location.js');
 
 mongoose.Promise = Promise;
 
-require('../server.js');
+const serverToggle = require('./lib/server-toggler.js');
+const server = require('../server.js');
 
 const url = `http://localhost:${process.env.PORT}`;
 
@@ -26,7 +27,7 @@ const testUser = {
 const testProfile = {
   displayName: 'testdisplayname',
   fullName: 'Test Name',
-  address: 'test address',
+  address: '111222333444555666777888',
   bio: 'test bio',
   avgRating: 3,
 };
@@ -40,7 +41,7 @@ const testUser2 = {
 const testProfile2 = {
   displayName: 'test2displayname',
   fullName: 'Test Name2',
-  address: 'test 2address',
+  address: '222333444555666777888999',
   bio: 'test2 bio',
   avgRating: 4,
 };
@@ -49,11 +50,13 @@ const testLocation1 = '777 Seven st 77777';
 const testLocation2 = '11 eleven ave virginia beach,va 11111';
 
 const testWay = {
-  startLocation: '1234 1st ave 98765',
-  endLocation: '432 test st seattle, wa 56789'
+  startLocation: '3028 1st ave seattle',
+  endLocation: '841 manhattan ave hermosa beach'
 };
 
 describe('Way Routes', function() {
+  before( done => serverToggle.serverOn(server, done));
+
   beforeEach( done => {
     new User(testUser)
     .generatePasswordHash(testUser.password)
@@ -71,7 +74,7 @@ describe('Way Routes', function() {
 
   beforeEach( done => {
     this.tempProfile = testProfile;
-    this.tempProfile.userID = this.tempUser._id;
+    this.tempProfile.profileID = this.tempUser._id;
     new Profile(testProfile).save()
     .then( profile => {
       this.tempProfile = profile;
@@ -97,7 +100,7 @@ describe('Way Routes', function() {
 
   beforeEach( done => {
     this.tempProfile2 = testProfile2;
-    this.tempProfile2.userID = this.tempUser2._id;
+    this.tempProfile2.profileID = this.tempUser2._id;
     new Profile(testProfile2).save()
     .then( profile => {
       this.tempProfile2 = profile;
@@ -127,8 +130,8 @@ describe('Way Routes', function() {
   beforeEach( done => {
     let tempWayObj = {
       profileID: this.tempProfile._id,
-      startLocationID: this.tempLocation1._id,
-      endLocationID: this.tempLocation2._id
+      startLocation: this.tempLocation1._id,
+      endLocation: this.tempLocation2._id
     };
     new Way(tempWayObj).save()
     .then( way => {
@@ -149,9 +152,11 @@ describe('Way Routes', function() {
   });
 
   afterEach( done => {
-    delete this.tempProfile.userID;
+    delete this.tempProfile.profileID;
     done();
   });
+
+  after( done => serverToggle.serverOff(server, done));
 
   describe('POST: /api/way', () => {
     describe('with a valid request body', () => {
@@ -164,23 +169,18 @@ describe('Way Routes', function() {
         .end((err, res) => {
           if (err) return done(err);
           Way.findById(res.body._id)
-          .populate('startLocationID')
-          .populate('endLocationID')
+          .populate('startLocation')
+          .populate('endLocation')
           .then( way => {
             expect(res.status).to.equal(200);
             expect(res.body.profileID).to.equal(this.tempProfile._id.toString());
             expect(res.body.wayerz.length).to.equal(1);
             expect(res.body.wayerz[0]).to.equal(this.tempProfile._id.toString());
-            expect(way.startLocationID.number).to.equal('1234');
-            expect(way.startLocationID.street).to.equal('1st');
-            expect(way.startLocationID.type).to.equal('ave');
-            expect(way.startLocationID.zip).to.equal('98765');
-            expect(way.endLocationID.number).to.equal('432');
-            expect(way.endLocationID.street).to.equal('test');
-            expect(way.endLocationID.type).to.equal('st');
-            expect(way.endLocationID.city).to.equal('seattle');
-            expect(way.endLocationID.state).to.equal('wa');
-            expect(way.endLocationID.zip).to.equal('56789');
+            expect(way.startLocation.zip).to.equal('98121');
+            expect(way.endLocation.number).to.equal('841');
+            expect(way.endLocation.city.toLowerCase()).to.equal('hermosa beach');
+            expect(way.endLocation.state.toLowerCase()).to.equal('ca');
+            expect(way.endLocation.zip).to.equal('90254');
             done();
           })
           .catch(done);
@@ -324,8 +324,8 @@ describe('Way Routes', function() {
           if (err) done(err);
           expect(res.status).to.equal(200);
           expect(res.body._id).to.equal(this.tempWay._id.toString());
-          expect(res.body.startLocationID).to.have.property('street');
-          expect(res.body.endLocationID).to.have.property('street');
+          expect(res.body.startLocation).to.have.property('street');
+          expect(res.body.endLocation).to.have.property('street');
           done();
         });
       });
@@ -357,28 +357,20 @@ describe('Way Routes', function() {
           expect(res.status).to.equal(200);
           expect(res.body).to.be.an('array');
           expect(res.body[0]._id).to.equal(this.tempWay._id.toString());
-          expect(res.body[0].startLocationID).to.equal(this.tempWay.startLocationID.toString());
-          expect(res.body[0].endLocationID).to.equal(this.tempWay.endLocationID.toString());
+          expect(res.body[0].startLocation._id.toString()).to.equal(this.tempWay.startLocation.toString());
+          expect(res.body[0].endLocation._id.toString()).to.equal(this.tempWay.endLocation.toString());
           done();
         });
       });
     });
-
-    // describe('with a unauth user', () => {
-    //   it('should return a 401', done => {
-    //     request.get(`${url}/api/way`)
-    //     .end((err, res) => {
-    //       expect(res.status).to.equal(401);
-    //       done();
-    //     });
-    //   });
-    // });
   });
 
   describe('PUT: /api/way/:id', () => {
     let updateWay = {
-      startTime: 9 * 60 + 45, //minutes
-      recurringDayOfWeek: [ 0,1,2,3,4 ]
+      'startTime.hour': 8,
+      'startTime.minutes': 15, //minutes
+      recurringDayOfWeek: [ 0,1,2,3,4 ],
+      startLocation: 'code fellows',
     };
     describe('with a valid id and request body', () => {
       it('should return an updated way', done => {
@@ -388,10 +380,11 @@ describe('Way Routes', function() {
           Authorization: `Bearer ${this.tempToken}`,
         })
         .end((err, res) => {
+          console.log('res body', res.body);
           if (err) done(err);
           expect(res.status).to.equal(200);
           expect(res.body._id).to.equal(this.tempWay._id.toString());
-          expect(res.body.startTime).to.equal(updateWay.startTime);
+          expect(res.body.startTime.hour).to.equal(updateWay['startTime.hour']);
           expect(res.body).to.have.property('startTime');
           done();
         });

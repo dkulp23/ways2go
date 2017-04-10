@@ -23,7 +23,7 @@ const testUser = {
 const testProfile = {
   displayName: 'testingonetwo',
   fullName: 'Mr. Test User',
-  address: '2901 3rd Ave, Seattle, WA 98121',
+  address: '111222333444555666777888',
   bio: 'Can\'t wait to meet my new best friend on ways2go!'
 };
 
@@ -36,12 +36,16 @@ const testUser2 = {
 const testProfile2 = {
   displayName: 'testingonetwo3',
   fullName: 'Mr. Test User',
-  address: '2901 3rd Ave, Seattle, WA 98121',
+  address: '222333444555666777888999',
   bio: 'Can\'t wait to meet my new best friend on ways2go!'
 };
 
 const testMessage = {
   text: 'Make it rain!'
+};
+
+const testMessage2 = { //eslint-disable-line
+  text: 'ayo!'
 };
 
 describe('Message Routes', function() {
@@ -61,7 +65,7 @@ describe('Message Routes', function() {
   });
 
   beforeEach( done => {
-    testProfile.userID = this.tempUser._id;
+    testProfile.profileID = this.tempUser._id;
     new Profile(testProfile).save()
     .then( profile => {
       this.tempProfile = profile;
@@ -86,7 +90,7 @@ describe('Message Routes', function() {
   });
 
   beforeEach( done => {
-    testProfile2.userID = this.tempUser2._id;
+    testProfile2.profileID = this.tempUser2._id;
     new Profile(testProfile2).save()
       .then( profile => {
         this.tempProfile2 = profile;
@@ -100,12 +104,27 @@ describe('Message Routes', function() {
     let message = {
       toProfileID: this.tempProfile2._id,
       fromProfileID: this.tempProfile._id,
-      text: 'holla'
+      text: 'ayo from 1 to 2',
     };
 
     new Message(message).save()
     .then(message => {
       this.tempMessage = message;
+      done();
+    })
+    .catch(done);
+  });
+
+  beforeEach( done => {
+    let message = {
+      toProfileID: this.tempProfile._id,
+      fromProfileID: this.tempProfile2._id,
+      text: 'holla from 2 to 1',
+    };
+
+    new Message(message).save()
+    .then(message => {
+      this.tempMessage2 = message;
       done();
     })
     .catch(done);
@@ -172,6 +191,22 @@ describe('Message Routes', function() {
         .end((err, res) => {
           expect(err).to.be.an('error');
           expect(res.status).to.equal(404);
+          done();
+        });
+      });
+    });
+  });
+
+  describe('GET: /api/message', () => {
+    describe('from an authorized user', () => {
+      it('should return all incoming and sent messages', done => {
+        request.get(`${url}/api/message`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`
+        })
+        .end((err, res) => {
+          console.log('all messages', res.body);
+          expect(res.status).to.equal(200);
           done();
         });
       });
