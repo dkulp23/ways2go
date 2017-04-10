@@ -11,8 +11,8 @@ const profileSchema = Schema({
   profileID: { type: Schema.Types.ObjectId, required: true },
   displayName: { type: String, required: true, unique: true },
   // photo: {
-    // s3Key: { type: String, unique: true },
-    // imageURI: { type: String, unique: true }
+  //   s3Key: { type: String, unique: true },
+  //   imageURI: { type: String, unique: true }
   // },
   fullName: { type: String },
   address: [{ type: Schema.Types.ObjectId, ref: 'location' }],

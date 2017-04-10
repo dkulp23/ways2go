@@ -10,19 +10,36 @@ const Profile = require('../model/profile.js');
 const Location = require('../model/location.js');
 const parseLocationGoogle = require('../lib/parse-location-google.js');
 
+const del = require('del');
+const multer = require('multer');
+const dataDir = `${__dirname}/../data`;
+const upload = multer({ dest: dataDir });
+const promS3upload = require('../lib/s3-uploads.js');
+
 const profileRouter = module.exports = Router();
 
-profileRouter.post('/api/profile', bearerAuth, jsonParser, function(req, res, next) {
+profileRouter.post('/api/profile', bearerAuth, jsonParser, upload.single('image'), function(req, res, next) {
   debug('POST: /api/profile');
 
   req.body.profileID = req.user._id;
 
-  parseLocationGoogle(req.body.address)
+  let promLocation = parseLocationGoogle(req.body.address)
   .then( geolocation => new Location(geolocation).save())
-  .then( location => {
-    req.body.address = location._id;
-    return new Profile(req.body).save();
-  })
+  .then( location => req.body.address = location._id)
+  .catch(next);
+
+  if (req.body.photo) {
+    var promPicUpload = promS3upload(req)
+    .then( s3data => {
+      del([`${dataDir}/*`]);
+      req.body.photo['s3Key'] = s3data.Key;
+      req.body.photo['imageURI'] = s3data.Location;
+    })
+    .catch(next);
+  }
+
+  Promise.all([promLocation, promPicUpload])
+  .then( () => new Profile(req.body).save())
   .then( profile => res.json(profile))
   .catch(next);
 });
@@ -74,7 +91,7 @@ profileRouter.put('/api/profile', bearerAuth, jsonParser, function(req, res, nex
     if (!profile[reqKeys]) return next(createError(400, 'bad request'));
     res.json(profile);
   })
-  .catch(next);  
+  .catch(next);
 });
 
 profileRouter.delete('/api/profile', bearerAuth, function(req, res, next) {
