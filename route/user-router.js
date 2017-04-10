@@ -9,7 +9,38 @@ const createError = require('http-errors');
 
 const User = require('../model/user.js');
 
+const { FacebookStrategy, passport } = require('../lib/passport-middleware.js');
+
 const userRouter = module.exports = Router();
+
+// passport.serializeUser(function(user, cb) {
+//   cb(null, user);
+// });
+//
+// passport.deserializeUser(function(obj, cb) {
+//   cb(null, obj);
+// });
+// userRouter.use(passport.initialize());
+// userRouter.use(passport.session());
+
+userRouter.get('/fbtest', function(req, res, next) {
+  console.log('user in fbtest', req.user);
+  next();
+});
+userRouter.get('/login/facebook',
+  passport.authenticate('facebook', { session: false }));
+
+userRouter.get('/login/facebook/return',
+  passport.authenticate('facebook', {
+    authType: 'rerequest',
+    scope: ['user_friends', 'manage_pages', 'picture'],
+    failureRedirect: '/fbtest',
+    session: false
+  }),
+  function(req, res) {
+    console.log('user in fb return', req.user);
+    res.redirect('/fbtest');
+  });
 
 userRouter.post('/api/signup', jsonParser, function(req, res, next) {
   debug('POST: /api/signup');

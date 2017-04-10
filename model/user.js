@@ -21,6 +21,7 @@ const userSchema = Schema({
   timeStamp: { type: Date, default: Date.now },
   findHash: { type: String, unique: true },
   provider: { type: String },
+  facebookID: { type: String },
 
 });
 
