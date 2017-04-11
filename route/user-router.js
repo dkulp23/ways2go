@@ -23,9 +23,13 @@ userRouter.get('/api/signup/facebook/return',
     failureRedirect: '/fbtest',
     session: false
   }),
-  function(req, res) {
+  function(req, res, next) {
     console.log('user in fb return', req.user);
-    res.json(req.user);
+
+    User.findById(req.user._id)
+    .then( user => user.generateToken())
+    .then( token => res.send(token))
+    .catch(next);
   });
 
 userRouter.post('/api/signup', jsonParser, function(req, res, next) {
