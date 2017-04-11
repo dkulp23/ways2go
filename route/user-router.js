@@ -18,16 +18,16 @@ userRouter.get('/api/signup/facebook',
 
 userRouter.get('/api/signup/facebook/return',
   passport.authenticate('facebook', {
-    authType: 'rerequest',
+    // authType: 'rerequest',
     scope: ['user_friends', 'manage_pages', 'picture'],
-    failureRedirect: '/fbtest',
     session: false
   }),
   function(req, res, next) {
-    console.log('user in fb return', req.user);
 
-    User.findById(req.user._id)
-    .then( user => user.generateToken())
+    console.log('req user in return', req.user);
+
+    User.find({ facebookID: req.user.facebookID })
+    .then( user => user[0].generateToken())
     .then( token => res.send(token))
     .catch(next);
   });
