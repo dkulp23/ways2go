@@ -18,7 +18,7 @@ const promS3upload = require('../lib/s3-uploads.js');
 
 const profileRouter = module.exports = Router();
 
-profileRouter.post('/api/profile', bearerAuth, jsonParser, upload.single('image'), function(req, res, next) {
+profileRouter.post('/api/profile', bearerAuth, jsonParser, upload.single('photo'), function(req, res, next) {
   debug('POST: /api/profile');
 
   req.body.profileID = req.user._id;
@@ -28,18 +28,20 @@ profileRouter.post('/api/profile', bearerAuth, jsonParser, upload.single('image'
   .then( location => req.body.address = location._id)
   .catch(next);
 
-  if (req.body.photo) {
+  if (req.file) {
     var promPicUpload = promS3upload(req)
     .then( s3data => {
       del([`${dataDir}/*`]);
-      req.body.photo['s3Key'] = s3data.Key;
-      req.body.photo['imageURI'] = s3data.Location;
+      req.body.photo = s3data.Location;
     })
     .catch(next);
   }
 
   Promise.all([promLocation, promPicUpload])
-  .then( () => new Profile(req.body).save())
+  .then( () => {
+    console.log('req body', req.body);
+    return new Profile(req.body).save();
+  })
   .then( profile => res.json(profile))
   .catch(next);
 });

@@ -1,4 +1,3 @@
-
 'use strict';
 
 const AWS = require('aws-sdk-mock');
@@ -7,10 +6,10 @@ module.exports = exports = {};
 
 exports.uploadMock = {
   ETag: ' "1234abcd"',
-  Location: 'http://testurl.com/test.png',
+  Location: 'http://mockurl.com/mock.png',
   Key: 'riderz.png',
   key: 'riderz.png',
-  Bucket: 'ways2go-test'
+  Bucket: 'ways2go'
 };
 
 AWS.mock('S3', 'upload', function(params, callback) {

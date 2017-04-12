@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/dkulp23/ways2go#readme",
   "devDependencies": {
+    "aws-sdk-mock": "^1.6.1",
     "chai": "^3.5.0",
     "coveralls": "^2.12.0",
     "gulp": "^3.9.1",

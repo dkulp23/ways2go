@@ -1,5 +1,7 @@
 'use strict';
 
+require('./lib/test-env.js');
+
 const expect = require('chai').expect;
 const request = require('superagent');
 const mongoose = require('mongoose');
@@ -9,12 +11,12 @@ const User = require('../model/user.js');
 const Profile = require('../model/profile.js');
 const Message = require('../model/message.js');
 const Location = require('../model/location.js');
-// const awsMocks = require('./lib/aws-mocks.js');
+const awsMocks = require('./lib/aws-mocks.js');
 
 mongoose.Promise = Promise;
 
-require('../server.js');
-require('./lib/test-env.js');
+const serverToggle = require('./lib/server-toggler.js');
+const server = require('../server.js');
 
 const url = `http://localhost:${process.env.PORT}`;
 
@@ -34,7 +36,16 @@ const testProfile = {
   displayName: 'testingonetwo',
   fullName: 'Mr. Test User',
   address: '2901 3rd Ave, Seattle, WA 98121',
-  bio: 'Can\'t wait to meet my new best friend on ways2go!'
+  bio: 'Can\'t wait to meet my new best friend on ways2go!',
+  photo: `${__dirname}/data/test.png`
+};
+
+const picProfile = {
+  displayName: 'testingonetwo',
+  fullName: 'Mr. Test User',
+  address: '2901 3rd Ave, Seattle, WA 98121',
+  bio: 'Can\'t wait to meet my new best friend on ways2go!',
+  photo: awsMocks.uploadMock.Location
 };
 
 const otherProfile = {
@@ -49,6 +60,14 @@ const testMessage = {
 };
 
 describe('Profile Routes', function() {
+  before( done => {
+    serverToggle.serverOn(server, done);
+  });
+
+  after( done => {
+    serverToggle.serverOff(server, done);
+  });
+  
   afterEach( done => {
     Promise.all([
       User.remove({}),
@@ -78,15 +97,21 @@ describe('Profile Routes', function() {
     describe('with a valid request', () => {
       it('should return a profile', done => {
         request.post(`${url}/api/profile`)
-        .send(testProfile)
         .set({
           Authorization: `Bearer ${this.tempToken}`
         })
+        .field('displayName', testProfile.displayName)
+        .field('fullName', testProfile.fullName)
+        .field('address', testProfile.address)
+        .field('bio', testProfile.bio)
+        .attach('photo', testProfile.photo)
         .end((err, res) => {
           if (err) return done(err);
+          console.log('res body', res.body);
           expect(res.status).to.equal(200);
           expect(res.body.displayName).to.equal(testProfile.displayName);
           expect(res.body.profileID).to.equal(this.tempUser._id.toString());
+          expect(res.body.photo).to.equal(picProfile.photo);
           done();
         });
       });
