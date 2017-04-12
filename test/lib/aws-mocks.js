@@ -13,12 +13,13 @@ exports.uploadMock = {
 };
 
 AWS.mock('S3', 'upload', function(params, callback) {
+  console.log('params', params);
   if (!params.ACL === 'public-read') {
     return callback(new Error('ACL must be public-read'));
   }
 
-  if (!params.Bucket === 'ways2go-test') {
-    return callback(new Error('bucket must be ways2go-test'));
+  if (!params.Bucket === 'ways2go') {
+    return callback(new Error('bucket must be ways2go'));
   }
 
   if (!params.Key) {

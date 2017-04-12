@@ -67,7 +67,7 @@ describe('Profile Routes', function() {
   after( done => {
     serverToggle.serverOff(server, done);
   });
-  
+
   afterEach( done => {
     Promise.all([
       User.remove({}),
@@ -78,7 +78,7 @@ describe('Profile Routes', function() {
     .catch(done);
   });
 
-  describe('POST: /api/profile', function() {
+  describe.only('POST: /api/profile', function() {
     beforeEach( done => {
       new User(testUser)
       .generatePasswordHash(testUser.password)
