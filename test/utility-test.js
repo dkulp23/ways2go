@@ -7,12 +7,21 @@ const Promise = require('bluebird');
 
 mongoose.Promise = Promise;
 
-require('../server.js');
+const serverToggle = require('./lib/server-toggler.js');
+const server = require('../server.js');
 
 const url = `http://localhost:${process.env.PORT}`;
 
 
 describe('App Utilities', function() {
+  before( done => {
+    serverToggle.serverOn(server, done);
+  });
+
+  after( done => {
+    serverToggle.serverOff(server, done);
+  });
+
   describe('Bearer Auth', () => {
     describe('request with no auth header', () => {
       it('should respond with a 401 code', done => {

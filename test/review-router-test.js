@@ -12,7 +12,8 @@ const Way = require('../model/way.js');
 const Review = require('../model/review.js');
 const Location = require('../model/location.js');
 
-require('../server.js');
+const serverToggle = require('./lib/server-toggler.js');
+const server = require('../server.js');
 const url = `http://localhost:${process.env.PORT}`;
 
 mongoose.Promise = Promise;
@@ -46,6 +47,14 @@ const mocReview = {
 };
 
 describe('Review Routes', function() {
+  before( done => {
+    serverToggle.serverOn(server, done);
+  });
+
+  after( done => {
+    serverToggle.serverOff(server, done);
+  });
+
   beforeEach( done => {
     new User(mocUser)
     .generatePasswordHash(mocUser.password)

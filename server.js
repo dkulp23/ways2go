@@ -1,10 +1,12 @@
 'use strict';
 
+const dotenv = require('dotenv');
+dotenv.load();
+
 const express = require('express');
 const debug = require('debug')('ways2go:server');
 const morgan = require('morgan');
 const cors = require('cors');
-const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const Promise = require('bluebird');
 
@@ -17,7 +19,6 @@ const reviewRouter = require('./route/review-router.js');
 
 const errors = require('./lib/error-middleware.js');
 
-dotenv.load();
 
 const PORT = process.env.PORT || 3000;
 const app = express();

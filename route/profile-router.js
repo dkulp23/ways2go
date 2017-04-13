@@ -9,12 +9,7 @@ const bearerAuth = require('../lib/bearer-auth-middleware.js');
 const Profile = require('../model/profile.js');
 const Location = require('../model/location.js');
 const parseLocationGoogle = require('../lib/parse-location-google.js');
-
-const del = require('del');
-const multer = require('multer');
-const dataDir = `${__dirname}/../data`;
-const upload = multer({ dest: dataDir });
-const promS3upload = require('../lib/s3-uploads.js');
+const upload = require('../lib/s3-uploads.js');
 
 const profileRouter = module.exports = Router();
 
@@ -22,24 +17,12 @@ profileRouter.post('/api/profile', bearerAuth, jsonParser, upload.single('photo'
   debug('POST: /api/profile');
 
   req.body.profileID = req.user._id;
+  if (req.file) req.body.photo = req.file.location;
 
-  let promLocation = parseLocationGoogle(req.body.address)
+  parseLocationGoogle(req.body.address)
   .then( geolocation => new Location(geolocation).save())
-  .then( location => req.body.address = location._id)
-  .catch(next);
-
-  if (req.file) {
-    var promPicUpload = promS3upload(req)
-    .then( s3data => {
-      del([`${dataDir}/*`]);
-      req.body.photo = s3data.Location;
-    })
-    .catch(next);
-  }
-
-  Promise.all([promLocation, promPicUpload])
-  .then( () => {
-    console.log('req body', req.body);
+  .then( location => {
+    req.body.address = location._id;
     return new Profile(req.body).save();
   })
   .then( profile => res.json(profile))
