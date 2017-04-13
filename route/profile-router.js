@@ -9,13 +9,15 @@ const bearerAuth = require('../lib/bearer-auth-middleware.js');
 const Profile = require('../model/profile.js');
 const Location = require('../model/location.js');
 const parseLocationGoogle = require('../lib/parse-location-google.js');
+const upload = require('../lib/s3-uploads.js');
 
 const profileRouter = module.exports = Router();
 
-profileRouter.post('/api/profile', bearerAuth, jsonParser, function(req, res, next) {
+profileRouter.post('/api/profile', bearerAuth, jsonParser, upload.single('photo'), function(req, res, next) {
   debug('POST: /api/profile');
 
   req.body.profileID = req.user._id;
+  if (req.file) req.body.photo = req.file.location;
 
   parseLocationGoogle(req.body.address)
   .then( geolocation => new Location(geolocation).save())
@@ -74,7 +76,7 @@ profileRouter.put('/api/profile', bearerAuth, jsonParser, function(req, res, nex
     if (!profile[reqKeys]) return next(createError(400, 'bad request'));
     res.json(profile);
   })
-  .catch(next);  
+  .catch(next);
 });
 
 profileRouter.delete('/api/profile', bearerAuth, function(req, res, next) {
