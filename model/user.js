@@ -12,12 +12,16 @@ require('mongoose-type-email');
 const Schema = mongoose.Schema;
 
 const userSchema = Schema({
-  username: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  email: { type: mongoose.SchemaTypes.Email, required: true, unique: true },
+  username: { type: String, unique: true, sparse: true },
+  password: { type: String },
+  email: { type: mongoose.SchemaTypes.Email, unique: true },
   timeStamp: { type: Date, default: Date.now },
-  findHash: { type: String, unique: true }
+  findHash: { type: String, unique: true },
+  provider: { type: String },
+  facebookID: { type: String, unique: true, sparse: true }
 });
+
+userSchema.index({username: 1, facebookID: 1}, {unique: true});
 
 userSchema.methods.generatePasswordHash = function(password) {
   debug('generatePasswordHash');
@@ -51,14 +55,15 @@ userSchema.methods.generateFindHash = function() {
   debug('generateFindHash');
 
   return new Promise((resolve, reject) => {
-    // let tries = 0;
 
     _generateFindHash.call(this);
 
     function _generateFindHash() {
       this.findHash = crypto.randomBytes(32).toString('hex');
       this.save()
-      .then( () => resolve(this.findHash))
+      .then( () => {
+        resolve(this.findHash);
+      })
       .catch( err => {
         return reject(err);
       });

@@ -8,8 +8,46 @@ const bearerAuth = require('../lib/bearer-auth-middleware.js');
 const createError = require('http-errors');
 
 const User = require('../model/user.js');
+const Profile = require('../model/profile.js');
+
+const { FacebookStrategy, passport } = require('../lib/passport-middleware.js'); //eslint-disable-line
 
 const userRouter = module.exports = Router();
+
+userRouter.get('/api/signup/facebook',
+  passport.authenticate('facebook', { session: false }));
+
+userRouter.get('/api/signup/facebook/return',
+  passport.authenticate('facebook', {
+    // authType: 'rerequest',
+    scope: ['user_friends', 'manage_pages', 'picture'],
+    session: false
+  }),
+  function(req, res, next) {
+    const { fbUser, fbInfo } = req.user;
+
+    Profile.find({ profileID: fbUser._id })
+    .then( profile => {
+      if ( profile.length === 0) {
+        new Profile({
+          profileID: fbUser._id,
+          displayName: fbInfo.displayName
+        }).save()
+        .then( () => {
+          return User.find({ facebookID: fbUser.facebookID });
+        });
+      }
+      return User.find({ facebookID: fbUser.facebookID });
+    })
+    .then( user => {
+      return user[0].generatePasswordHash(user[0].facebookID);
+    })
+    .then( user => {
+      return user.generateToken();
+    })
+    .then( token => res.send(token))
+    .catch(next);
+  });
 
 userRouter.post('/api/signup', jsonParser, function(req, res, next) {
   debug('POST: /api/signup');
