@@ -10,7 +10,7 @@ const createError = require('http-errors');
 const User = require('../model/user.js');
 const Profile = require('../model/profile.js');
 
-const { FacebookStrategy, passport } = require('../lib/passport-middleware.js');
+const { FacebookStrategy, passport } = require('../lib/passport-middleware.js'); //eslint-disable-line
 
 const userRouter = module.exports = Router();
 
