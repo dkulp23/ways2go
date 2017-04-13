@@ -24,34 +24,25 @@ userRouter.get('/api/signup/facebook/return',
     session: false
   }),
   function(req, res, next) {
-
-    console.log('req user in return', req.user);
     const { fbUser, fbInfo } = req.user;
 
     Profile.find({ profileID: fbUser._id })
     .then( profile => {
-      console.log('profile before if', profile);
       if ( profile.length === 0) {
-        console.log('profile in the if', profile);
         new Profile({
           profileID: fbUser._id,
           displayName: fbInfo.displayName
         }).save()
-        .then( profile => {
-          console.log('new profile', profile);
+        .then( () => {
           return User.find({ facebookID: fbUser.facebookID });
         });
       }
       return User.find({ facebookID: fbUser.facebookID });
     })
     .then( user => {
-      console.log('user before generatePasswordHash', user);
       return user[0].generatePasswordHash(user[0].facebookID);
     })
-    // .then( user => user.save())
-    // .then( user => User.findById(user._id))
     .then( user => {
-      console.log('user before generateToken', user);
       return user.generateToken();
     })
     .then( token => res.send(token))

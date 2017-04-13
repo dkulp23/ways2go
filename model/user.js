@@ -61,8 +61,7 @@ userSchema.methods.generateFindHash = function() {
     function _generateFindHash() {
       this.findHash = crypto.randomBytes(32).toString('hex');
       this.save()
-      .then( user => {
-        console.log('user in findhash', user);
+      .then( () => {
         resolve(this.findHash);
       })
       .catch( err => {
