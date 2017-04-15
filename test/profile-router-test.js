@@ -216,6 +216,63 @@ describe('Profile Routes', function() {
     });
   });
 
+  describe('GET: /api/profile/user', function() {
+    beforeEach( done => {
+      new User(testUser)
+      .generatePasswordHash(testUser.password)
+      .then( user => user.save())
+      .then( user => {
+        this.tempUser = user;
+        return user.generateToken();
+      })
+      .then( token => {
+        this.tempToken = token;
+        done();
+      })
+      .catch(done);
+    });
+
+    beforeEach( done => {
+      testProfile.profileID = this.tempUser._id.toString();
+      testProfile.address = '111222333444555666777888';
+      new Profile(testProfile).save()
+      .then( profile => {
+        this.tempProfile = profile;
+        done();
+      })
+      .catch(done);
+    });
+
+    afterEach( () => {
+      delete testProfile.profileID;
+    });
+
+    describe('with a valid request', () => {
+      it('should return a profile', done => {
+        request.get(`${url}/api/profile/user`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`
+        })
+        .end((err, res) => {
+          if (err) return done(err);
+          expect(res.status).to.equal(200);
+          expect(res.body.displayName).to.equal(testProfile.displayName);
+          done();
+        });
+      });
+    });
+
+    describe('without a token', () => {
+      it('should return a 401 error', done => {
+        request.get(`${url}/api/profile/user`)
+        .end( err => {
+          expect(err.status).to.equal(401);
+          done();
+        });
+      });
+    });
+  });
+
   describe('PUT: /api/profile', function() {
     beforeEach( done => {
       let user = new User(testUser);
