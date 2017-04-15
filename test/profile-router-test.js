@@ -1,6 +1,6 @@
 'use strict';
 
-require('./lib/test-env.js');
+// require('./lib/test-env.js');
 
 const expect = require('chai').expect;
 const request = require('superagent');
@@ -109,7 +109,6 @@ describe('Profile Routes', function() {
         .attach('photo', testProfile.photo)
         .end((err, res) => {
           if (err) return done(err);
-          console.log('test res body', res.body);
           expect(res.status).to.equal(200);
           expect(res.body.displayName).to.equal(testProfile.displayName);
           expect(res.body.profileID).to.equal(this.tempUser._id.toString());
@@ -123,9 +122,8 @@ describe('Profile Routes', function() {
       it('should return a 401 error', done => {
         request.post(`${url}/api/profile`)
         .send(testProfile)
-        .end((err, res) => {
-          expect(res.status).to.equal(401);
-          expect(res.text).to.equal('UnauthorizedError');
+        .end( err => {
+          expect(err.status).to.equal(401);
           done();
         });
       });
@@ -140,10 +138,8 @@ describe('Profile Routes', function() {
         .send({
           bio: 'Incomplete Profile'
         })
-        .end((err, res) => {
+        .end((err) => {
           expect(err.status).to.equal(400);
-          expect(err.message).to.equal('Bad Request');
-          expect(res.text).to.equal('Error');
           done();
         });
       });
@@ -198,9 +194,8 @@ describe('Profile Routes', function() {
     describe('without a token', () => {
       it('should return a 401 error', done => {
         request.get(`${url}/api/profile/${this.tempProfile._id}`)
-        .end((err, res) => {
+        .end((err) => {
           expect(err.status).to.equal(401);
-          expect(res.text).to.equal('UnauthorizedError');
           done();
         });
       });
@@ -213,9 +208,8 @@ describe('Profile Routes', function() {
         .set({
           Authorization: `Bearer ${this.tempToken}`
         })
-        .end((err, res) => {
+        .end( err => {
           expect(err.status).to.equal(404);
-          expect(res.text).to.equal('NotFoundError');
           done();
         });
       });
@@ -283,9 +277,8 @@ describe('Profile Routes', function() {
         .send({
           displayName: 'cooldisplayname'
         })
-        .end((err, res) => {
+        .end( err => {
           expect(err.status).to.equal(401);
-          expect(res.text).to.equal('UnauthorizedError');
           done();
         });
       });
@@ -300,9 +293,8 @@ describe('Profile Routes', function() {
         .send({
           fakeProp: 'this should break'
         })
-        .end((err, res) => {
+        .end( err => {
           expect(err.status).to.equal(400);
-          expect(res.text).to.equal('BadRequestError');
           done();
         });
       });
@@ -402,9 +394,8 @@ describe('Profile Routes', function() {
     describe('without a token', () => {
       it('should return a 401 error', done => {
         request.delete(`${url}/api/profile`)
-        .end((err, res) => {
+        .end( err => {
           expect(err.status).to.equal(401);
-          expect(res.text).to.equal('UnauthorizedError');
           done();
         });
       });
@@ -489,9 +480,8 @@ describe('Profile Routes', function() {
     describe('without a token', () => {
       it('should return a 401 error', done => {
         request.get(`${url}/api/profile`)
-        .end((err, res) => {
+        .end( err => {
           expect(err.status).to.equal(401);
-          expect(res.text).to.equal('UnauthorizedError');
           done();
         });
       });
