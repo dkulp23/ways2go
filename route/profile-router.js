@@ -29,6 +29,19 @@ profileRouter.post('/api/profile', bearerAuth, jsonParser, upload.single('photo'
   .catch(next);
 });
 
+profileRouter.get('/api/profile/user', bearerAuth, function(req, res, next) {
+  debug('GET: /api/profile/user');
+
+  Profile.findOne({ profileID: req.user._id })
+  .populate('reviews')
+  .populate('address')
+  .then( profile => {
+    if (!profile) return next(createError(404, 'Profile Not Found'));
+    res.json(profile);
+  })
+  .catch(next);
+});
+
 profileRouter.get('/api/profile/:id', bearerAuth, function(req, res, next) {
   debug('GET: /api/profile/:id');
 
