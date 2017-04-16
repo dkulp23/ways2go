@@ -25,7 +25,7 @@ const profileSchema = Schema({
 });
 
 profileSchema.pre('remove', function(next) {
-  this.model('message').remove({ from_user_id: this._id }, next);
+  this.model('message').remove({ fromProfileID: this._id }, next);
 });
 
 const Profile = module.exports = mongoose.model('profile', profileSchema);
