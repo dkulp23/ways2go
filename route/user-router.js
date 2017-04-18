@@ -45,7 +45,26 @@ userRouter.get('/api/signup/facebook/return',
     .then( user => {
       return user.generateToken();
     })
-    .then( token => res.send(token))
+    .then( token => {
+      const tokenHtml = `<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+  </head>
+  <body>
+  <script type="text/javascript">
+    console.log('in wack jam');
+    window.localStorage[${token}]  =  ${token};
+    window.opener.location.reload(false);
+    window.close();
+  </script>
+  </body>
+</html>
+`;
+
+      res.send(tokenHtml);
+    })
     .catch(next);
   });
 
