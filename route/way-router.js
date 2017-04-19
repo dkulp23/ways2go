@@ -44,6 +44,12 @@ wayRouter.post('/api/way', bearerAuth, jsonParser, function(req, res, next) {
       way.wayerz.push(way.profileID);
       return way.save();
     })
+    .then( way => {
+      return Way.findById(way._id)
+      .populate('startLocation')
+      .populate('endLocation')
+      .populate('wayerz');
+    })
     .then( way => res.json(way))
     .catch(next);
   });
