@@ -15,11 +15,14 @@ const waySchema = Schema({
   wayerz: [{ type: Schema.Types.ObjectId , ref:'profile'}],
   timestamp: { type: Date, default: Date.now },
   recurringDayOfWeek: [{ type: Number }],
-  startTime: {
-    hour:{ type: Number, min: 0, max: 24 },
-    minutes: { type: Number, min: 0, max: 60 },
-    timeWindow: { type: Number },
-  },
+  hour:{ type: Number, min: 0, max: 24 },
+  minutes: { type: Number, min: 0, max: 60 },
+  timeWindow: { type: Number },
+  // startTime: {
+  //   hour:{ type: Number, min: 0, max: 24 },
+  //   minutes: { type: Number, min: 0, max: 60 },
+  //   timeWindow: { type: Number },
+  // },
   oneTimeDate: { type: Date }
 });
 
