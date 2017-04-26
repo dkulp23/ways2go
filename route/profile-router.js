@@ -66,10 +66,14 @@ profileRouter.get('/api/profile', bearerAuth, function(req, res, next) {
   .catch(next);
 });
 
-profileRouter.put('/api/profile', bearerAuth, jsonParser, function(req, res, next) {
+profileRouter.put('/api/profile', bearerAuth, jsonParser, upload.single('photo'),  function(req, res, next) {
   debug('PUT: /api/profile');
 
   let reqKeys = Object.keys(req.body);
+  if (req.file) {
+    req.body.photo = req.file.location;
+    reqKeys.push('photo');
+  }
 
   if (reqKeys.includes('address')) {
     parseLocationGoogle(req.body.address)
@@ -84,9 +88,16 @@ profileRouter.put('/api/profile', bearerAuth, jsonParser, function(req, res, nex
     .catch(next);
     return;
   }
+
   Profile.findOneAndUpdate({ profileID: req.user._id }, req.body, { new: true })
   .then( profile => {
-    if (!profile[reqKeys]) return next(createError(400, 'bad request'));
+    let reqCheck = reqKeys.reduce(function(acc, ele) {
+      if (profile[ele]) acc.push(ele);
+      return acc;
+    }, []);
+    if (reqCheck.length < 1) {
+      return next(createError(400, 'bad request'));
+    }
     res.json(profile);
   })
   .catch(next);
