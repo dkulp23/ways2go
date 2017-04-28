@@ -246,8 +246,6 @@ describe('Way Routes', function() {
           if (err) done(err);
           expect(res.status).to.equal(200);
           expect(res.body.wayerz.length).to.equal(2);
-          expect(res.body.wayerz[1]).to.equal(this.tempProfile2._id.toString());
-          expect(res.body._id).to.equal(this.tempWay._id.toString());
           done();
         });
       });
