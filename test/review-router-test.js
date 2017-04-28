@@ -12,7 +12,8 @@ const Way = require('../model/way.js');
 const Review = require('../model/review.js');
 const Location = require('../model/location.js');
 
-require('../server.js');
+const serverToggle = require('./lib/server-toggler.js');
+const server = require('../server.js');
 const url = `http://localhost:${process.env.PORT}`;
 
 mongoose.Promise = Promise;
@@ -32,7 +33,7 @@ const mocUser2 = {
 const mocProfile = {
   displayName: 'mocdisplayname',
   fullName: 'Test Name',
-  address: 'moc address',
+  address: '111222333444555666777888',
   bio: 'moc bio',
   avgRating: 3
 };
@@ -46,6 +47,14 @@ const mocReview = {
 };
 
 describe('Review Routes', function() {
+  before( done => {
+    serverToggle.serverOn(server, done);
+  });
+
+  after( done => {
+    serverToggle.serverOff(server, done);
+  });
+
   beforeEach( done => {
     new User(mocUser)
     .generatePasswordHash(mocUser.password)
@@ -78,7 +87,7 @@ describe('Review Routes', function() {
 
   beforeEach( done => {
     this.tempProfile = mocProfile;
-    this.tempProfile.userID = this.tempUser._id;
+    this.tempProfile.profileID = this.tempUser._id;
     new Profile(mocProfile).save()
     .then( profile => {
       this.tempProfile = profile;
@@ -108,8 +117,8 @@ describe('Review Routes', function() {
   beforeEach( done => {
     let tempWayObj = {
       profileID: this.tempProfile._id,
-      startLocationID: this.tempLocation1._id,
-      endLocationID: this.tempLocation2._id
+      startLocation: this.tempLocation1._id,
+      endLocation: this.tempLocation2._id
     };
     new Way(tempWayObj).save()
     .then( way => {
@@ -120,7 +129,7 @@ describe('Review Routes', function() {
   });
 
   beforeEach( done => {
-    mocReview.userID = this.tempUser._id;
+    mocReview.profileID = this.tempUser._id;
     mocReview.wayID = this.tempWay._id;
     Profile.findByIdAndAddReview(this.tempProfile._id, mocReview)
     .then( review => {
@@ -151,9 +160,9 @@ describe('Review Routes', function() {
       .end((err, res) => {
         if (err) return done(err);
         Review.findById(res.body._id)
-        .populate('userID')
+        .populate('profileID')
         .populate('wayID')
-        .populate('reviewedUserID')
+        .populate('reviewedprofileID')
         .then( review => {
           if (err) return done(err);
           expect(res.status).to.equal(200);

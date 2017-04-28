@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/dkulp23/ways2go.svg?branch=master)](https://travis-ci.org/dkulp23/ways2go)
-[![Coverage Status](https://coveralls.io/repos/github/dkulp23/ways2go/badge.svg?branch=staging)](https://coveralls.io/github/dkulp23/ways2go?branch=staging)
+[![Coverage Status](https://coveralls.io/repos/github/dkulp23/ways2go/badge.svg?branch=master)](https://coveralls.io/github/dkulp23/ways2go?branch=master)
 
 
 # Ways2Go
@@ -29,7 +29,7 @@ This is the entry point for the Ways2Go interface. In order to interact with mos
 This will be the customizable home base for each individual user. The Profile `._id` provided by [Mongodb](https://docs.mongodb.com/manual/core/document/) will serve as the tether that loosely binds the individual to their Ways, Messages and Reviews.
 ```javascript
 {
-    userID: {Object},
+    profileID: {Object},
     displayName: "Rollin with my Homies",
     fullName: "Joe Driver",
     address: "2909 3rd Ave, Seattle, WA 98103",
@@ -40,7 +40,7 @@ This will be the customizable home base for each individual user. The Profile `.
 }
 ```
 - Notes
-    - `userID` automatically created with `user._id` when Profile is created
+    - `profileID` automatically created with `user._id` when Profile is created
     - `avgRating` is generated from aggregate of review ratings
     - `timeStamp` is automatically generated when Profile is created
     - `reviews` is an array of review._id objects for reviews of Profile owner
@@ -53,9 +53,9 @@ This feature will give users the ability to leave feedback for each other. When 
   rating: { type: Number, required: true },
   comment: { type: String, required: false },
   timestamp: { type: Date, required: true, default: Date.now },
-  userID: { type: Schema.Types.ObjectId, required: true },
+  profileID: { type: Schema.Types.ObjectId, required: true },
   wayID: { type: Schema.Types.ObjectId, required: true},
-  reviewedUserID: { type: Schema.Types.ObjectId, required: true }
+  reviewedprofileID: { type: Schema.Types.ObjectId, required: true }
 }
 ```
 ### _Message_
@@ -152,7 +152,7 @@ Should be sent in JSON format:
 ##### Response
 If successful, `res.status` will be `200` and `res.body` will be:
 ```json
-{ "userID": "<user._id>", "displayName": "Rollin with my Homies", "fullName": "Joe Driver",
+{ "profileID": "<user._id>", "displayName": "Rollin with my Homies", "fullName": "Joe Driver",
 "address": "2909 3rd Ave, Seattle, WA 98103",
 "bio": "Who says that the ride to work can't be fun?", "avgRating": "<avg score>", "timeStamp": "<time profile created>", "reviews": "[]" }
 ```
@@ -164,7 +164,7 @@ This enpoint will allow a registered user, with a token, read access to a single
 ##### Response
 The requested profile on `res.body` in JSON format.
 ```javascript
-{ "userID": "<user._id>", "displayName": "Rollin with my Homies", "fullName": "Joe Driver",
+{ "profileID": "<user._id>", "displayName": "Rollin with my Homies", "fullName": "Joe Driver",
 "address": "2909 3rd Ave, Seattle, WA 98103",
 "bio": "Who says that the ride to work can't be fun?", "avgRating": "<avg score>", "timeStamp": "<time profile created>", "reviews": "[{array of Review objects}]" }
 ```
@@ -248,8 +248,8 @@ If successful, `res.status` will be `200` and `res.body` will be the Way that wa
 Example
 ```json
 { "profileID": "58cb5469422bbb001115c74f",
-  "startLocationID": "58cb6af2422bbb001115c758",
-  "endLocationID": "58cb6af2422bbb001115c759",
+  "startLocation": "58cb6af2422bbb001115c758",
+  "endLocation": "58cb6af2422bbb001115c759",
   "_id": "58cb6af2422bbb001115c75a",
   "recurringDayOfWeek": [],
   "timestamp": "2017-03-17T04:49:54.925Z",
@@ -267,7 +267,7 @@ Example
 {
     "__v": 1,
     "_id": "58cb6af2422bbb001115c75a",
-    "endLocationID": {
+    "endLocation": {
         "__v": 0,
         "_id": "58cb6af2422bbb001115c759",
         "city": "Seattle",
@@ -280,7 +280,7 @@ Example
     },
     "profileID": "58cb5469422bbb001115c74f",
     "recurringDayOfWeek": [],
-    "startLocationID": {
+    "startLocation": {
         "__v": 0,
         "_id": "58cb6af2422bbb001115c758",
         "city": "Seattle",
@@ -300,7 +300,7 @@ Example
             "displayName": "ayowayer",
             "reviews": [],
             "timeStamp": "2017-03-17T03:13:45.018Z",
-            "userID": "58cb4aaddb9f2e0011bc74b3"
+            "profileID": "58cb4aaddb9f2e0011bc74b3"
         }
     ]
 }
@@ -328,8 +328,8 @@ Example
 ```json
 { "_id":"58cb6af2422bbb001115c75a",
   "profileID":"58cb5469422bbb001115c74f",
-  "startLocationID":"58cb6af2422bbb001115c758",
-  "endLocationID":"58cb6af2422bbb001115c759",
+  "startLocation":"58cb6af2422bbb001115c758",
+  "endLocation":"58cb6af2422bbb001115c759",
   "__v":1,
   "startTime":630,
   "recurringDayOfWeek":[1,2,3]
@@ -360,8 +360,8 @@ Example
 ```json
 { "_id":"58cb6af2422bbb001115c75a",
   "profileID":"58cb5469422bbb001115c74f",
-  "startLocationID":"58cb6af2422bbb001115c758",
-  "endLocationID":"58cb6af2422bbb001115c759",
+  "startLocation":"58cb6af2422bbb001115c758",
+  "endLocation":"58cb6af2422bbb001115c759",
   "__v":2,
   "startTime":630,
   "recurringDayOfWeek":[1,2,3],
@@ -380,8 +380,8 @@ Example
 ```json
 { "_id":"58cb6af2422bbb001115c75a",
   "profileID":"58cb5469422bbb001115c74f",
-  "startLocationID":"58cb6af2422bbb001115c758",
-  "endLocationID":"58cb6af2422bbb001115c759",
+  "startLocation":"58cb6af2422bbb001115c758",
+  "endLocation":"58cb6af2422bbb001115c759",
   "__v":2,
   "startTime":630,
   "recurringDayOfWeek":[1,2,3],

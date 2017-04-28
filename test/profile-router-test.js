@@ -1,5 +1,7 @@
 'use strict';
 
+// require('./lib/test-env.js');
+
 const expect = require('chai').expect;
 const request = require('superagent');
 const mongoose = require('mongoose');
@@ -8,10 +10,13 @@ const Promise = require('bluebird');
 const User = require('../model/user.js');
 const Profile = require('../model/profile.js');
 const Message = require('../model/message.js');
+const Location = require('../model/location.js');
+// const awsMocks = require('./lib/aws-mocks.js');
 
 mongoose.Promise = Promise;
 
-require('../server.js');
+const serverToggle = require('./lib/server-toggler.js');
+const server = require('../server.js');
 
 const url = `http://localhost:${process.env.PORT}`;
 
@@ -31,8 +36,17 @@ const testProfile = {
   displayName: 'testingonetwo',
   fullName: 'Mr. Test User',
   address: '2901 3rd Ave, Seattle, WA 98121',
-  bio: 'Can\'t wait to meet my new best friend on ways2go!'
+  bio: 'Can\'t wait to meet my new best friend on ways2go!',
+  photo: `${__dirname}/data/test.png`
 };
+
+// const picProfile = {
+//   displayName: 'testingonetwo',
+//   fullName: 'Mr. Test User',
+//   address: '2901 3rd Ave, Seattle, WA 98121',
+//   bio: 'Can\'t wait to meet my new best friend on ways2go!',
+//   photo: awsMocks.uploadMock.Location
+// };
 
 const otherProfile = {
   displayName: 'testingtwotwo',
@@ -46,10 +60,19 @@ const testMessage = {
 };
 
 describe('Profile Routes', function() {
+  before( done => {
+    serverToggle.serverOn(server, done);
+  });
+
+  after( done => {
+    serverToggle.serverOff(server, done);
+  });
+
   afterEach( done => {
     Promise.all([
       User.remove({}),
-      Profile.remove({})
+      Profile.remove({}),
+      Location.remove({})
     ])
     .then( () => done())
     .catch(done);
@@ -65,6 +88,7 @@ describe('Profile Routes', function() {
         return user.generateToken();
       })
       .then( token => {
+        console.log('token', token);
         this.tempToken = token;
         done();
       })
@@ -73,16 +97,22 @@ describe('Profile Routes', function() {
 
     describe('with a valid request', () => {
       it('should return a profile', done => {
+        let date = Date.now().toString(); //eslint-disable-line
         request.post(`${url}/api/profile`)
-        .send(testProfile)
         .set({
           Authorization: `Bearer ${this.tempToken}`
         })
+        .field('displayName', testProfile.displayName)
+        .field('fullName', testProfile.fullName)
+        .field('address', testProfile.address)
+        .field('bio', testProfile.bio)
+        .attach('photo', testProfile.photo)
         .end((err, res) => {
           if (err) return done(err);
           expect(res.status).to.equal(200);
           expect(res.body.displayName).to.equal(testProfile.displayName);
-          expect(res.body.userID).to.equal(this.tempUser._id.toString());
+          expect(res.body.profileID).to.equal(this.tempUser._id.toString());
+          // expect(res.body.photo).to.equal(`https://ways2go.s3.amazonaws.com/${date}`);
           done();
         });
       });
@@ -92,9 +122,8 @@ describe('Profile Routes', function() {
       it('should return a 401 error', done => {
         request.post(`${url}/api/profile`)
         .send(testProfile)
-        .end((err, res) => {
-          expect(res.status).to.equal(401);
-          expect(res.text).to.equal('UnauthorizedError');
+        .end( err => {
+          expect(err.status).to.equal(401);
           done();
         });
       });
@@ -109,9 +138,8 @@ describe('Profile Routes', function() {
         .send({
           bio: 'Incomplete Profile'
         })
-        .end((err, res) => {
+        .end((err) => {
           expect(err.status).to.equal(400);
-          expect(res.text).to.equal('BadRequestError');
           done();
         });
       });
@@ -135,7 +163,8 @@ describe('Profile Routes', function() {
     });
 
     beforeEach( done => {
-      testProfile.userID = this.tempUser._id.toString();
+      testProfile.profileID = this.tempUser._id.toString();
+      testProfile.address = '111222333444555666777888';
       new Profile(testProfile).save()
       .then( profile => {
         this.tempProfile = profile;
@@ -145,7 +174,7 @@ describe('Profile Routes', function() {
     });
 
     afterEach( () => {
-      delete testProfile.userID;
+      delete testProfile.profileID;
     });
 
     describe('with a valid request', () => {
@@ -165,9 +194,8 @@ describe('Profile Routes', function() {
     describe('without a token', () => {
       it('should return a 401 error', done => {
         request.get(`${url}/api/profile/${this.tempProfile._id}`)
-        .end((err, res) => {
+        .end((err) => {
           expect(err.status).to.equal(401);
-          expect(res.text).to.equal('UnauthorizedError');
           done();
         });
       });
@@ -180,9 +208,65 @@ describe('Profile Routes', function() {
         .set({
           Authorization: `Bearer ${this.tempToken}`
         })
-        .end((err, res) => {
+        .end( err => {
           expect(err.status).to.equal(404);
-          expect(res.text).to.equal('NotFoundError');
+          done();
+        });
+      });
+    });
+  });
+
+  describe('GET: /api/profile/user', function() {
+    beforeEach( done => {
+      new User(testUser)
+      .generatePasswordHash(testUser.password)
+      .then( user => user.save())
+      .then( user => {
+        this.tempUser = user;
+        return user.generateToken();
+      })
+      .then( token => {
+        this.tempToken = token;
+        done();
+      })
+      .catch(done);
+    });
+
+    beforeEach( done => {
+      testProfile.profileID = this.tempUser._id.toString();
+      testProfile.address = '111222333444555666777888';
+      new Profile(testProfile).save()
+      .then( profile => {
+        this.tempProfile = profile;
+        done();
+      })
+      .catch(done);
+    });
+
+    afterEach( () => {
+      delete testProfile.profileID;
+    });
+
+    describe('with a valid request', () => {
+      it('should return a profile', done => {
+        request.get(`${url}/api/profile/user`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`
+        })
+        .end((err, res) => {
+          if (err) return done(err);
+          expect(res.status).to.equal(200);
+          expect(res.body.displayName).to.equal(testProfile.displayName);
+          done();
+        });
+      });
+    });
+
+    describe('without a token', () => {
+      it('should return a 401 error', done => {
+        request.get(`${url}/api/profile/user`)
+        .end( err => {
+          expect(err.status).to.equal(401);
           done();
         });
       });
@@ -206,7 +290,8 @@ describe('Profile Routes', function() {
     });
 
     beforeEach( done => {
-      testProfile.userID = this.tempUser._id.toString();
+      testProfile.profileID = this.tempUser._id.toString();
+      testProfile.address = '111222333444555666777888';
       new Profile(testProfile).save()
       .then( profile => {
         this.tempProfile = profile;
@@ -216,7 +301,7 @@ describe('Profile Routes', function() {
     });
 
     afterEach( () => {
-      delete testProfile.userID;
+      delete testProfile.profileID;
     });
 
     describe('with a valid request', () => {
@@ -226,12 +311,18 @@ describe('Profile Routes', function() {
           Authorization: `Bearer ${this.tempToken}`
         })
         .send({
-          displayName: 'cooldisplayname'
+          displayName: 'cooldisplayname',
+          address: '3636 Evanston Ave N, Seattle, WA 98103'
         })
         .end((err, res) => {
           if (err) return done(err);
           expect(res.status).to.equal(200);
           expect(res.body.displayName).to.equal('cooldisplayname');
+          Location.find({ fullAddress: /3636 Evanston Ave N/i })
+          .then( location => {
+            expect(location).to.not.be.null;
+          })
+          .catch(done);
           done();
         });
       });
@@ -243,9 +334,8 @@ describe('Profile Routes', function() {
         .send({
           displayName: 'cooldisplayname'
         })
-        .end((err, res) => {
+        .end( err => {
           expect(err.status).to.equal(401);
-          expect(res.text).to.equal('UnauthorizedError');
           done();
         });
       });
@@ -260,9 +350,8 @@ describe('Profile Routes', function() {
         .send({
           fakeProp: 'this should break'
         })
-        .end((err, res) => {
+        .end( err => {
           expect(err.status).to.equal(400);
-          expect(res.text).to.equal('BadRequestError');
           done();
         });
       });
@@ -286,7 +375,8 @@ describe('Profile Routes', function() {
     });
 
     beforeEach( done => {
-      testProfile.userID = this.tempUser._id.toString();
+      testProfile.profileID = this.tempUser._id.toString();
+      testProfile.address = '111222333444555666777888';
       new Profile(testProfile).save()
       .then( profile => {
         this.tempProfile = profile;
@@ -311,7 +401,8 @@ describe('Profile Routes', function() {
     });
 
     beforeEach( done => {
-      otherProfile.userID = this.tempUser._id.toString();
+      otherProfile.profileID = this.tempUser._id.toString();
+      otherProfile.address = '222333444555666777888999';
       new Profile(otherProfile).save()
       .then( profile => {
         this.tempProfileTwo = profile;
@@ -332,8 +423,8 @@ describe('Profile Routes', function() {
     });
 
     afterEach( done => {
-      delete testProfile.userID;
-      delete otherProfile.userID;
+      delete testProfile.profileID;
+      delete otherProfile.profileID;
       Message.remove({})
       .then( () => done())
       .catch(done);
@@ -360,9 +451,8 @@ describe('Profile Routes', function() {
     describe('without a token', () => {
       it('should return a 401 error', done => {
         request.delete(`${url}/api/profile`)
-        .end((err, res) => {
+        .end( err => {
           expect(err.status).to.equal(401);
-          expect(res.text).to.equal('UnauthorizedError');
           done();
         });
       });
@@ -386,7 +476,8 @@ describe('Profile Routes', function() {
     });
 
     beforeEach( done => {
-      testProfile.userID = this.tempUser._id.toString();
+      testProfile.profileID = this.tempUser._id.toString();
+      testProfile.address = '111222333444555666777888';
       new Profile(testProfile).save()
       .then( profile => {
         this.tempProfile = profile;
@@ -411,7 +502,8 @@ describe('Profile Routes', function() {
     });
 
     beforeEach( done => {
-      otherProfile.userID = this.tempUserTwo._id.toString();
+      otherProfile.profileID = this.tempUserTwo._id.toString();
+      otherProfile.address = '222333444555666777888999';
       new Profile(otherProfile).save()
       .then( profile => {
         this.tempProfileTwo = profile;
@@ -421,8 +513,8 @@ describe('Profile Routes', function() {
     });
 
     afterEach( () => {
-      delete testProfile.userID;
-      delete otherProfile.userID;
+      delete testProfile.profileID;
+      delete otherProfile.profileID;
     });
 
     describe('with a valid request', () => {
@@ -445,9 +537,8 @@ describe('Profile Routes', function() {
     describe('without a token', () => {
       it('should return a 401 error', done => {
         request.get(`${url}/api/profile`)
-        .end((err, res) => {
+        .end( err => {
           expect(err.status).to.equal(401);
-          expect(res.text).to.equal('UnauthorizedError');
           done();
         });
       });

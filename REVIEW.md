@@ -6,9 +6,9 @@ This feature will give users the ability to leave feedback for each other. When 
   rating: { type: Number, required: true },
   comment: { type: String, required: false },
   timestamp: { type: Date, required: true, default: Date.now },
-  userID: { type: Schema.Types.ObjectId, required: true },
+  profileID: { type: Schema.Types.ObjectId, required: true },
   wayID: { type: Schema.Types.ObjectId, required: true},
-  reviewedUserID: { type: Schema.Types.ObjectId, required: true }
+  reviewedprofileID: { type: Schema.Types.ObjectId, required: true }
 }
 ```
 

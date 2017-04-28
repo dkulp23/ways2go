@@ -8,7 +8,8 @@ const User = require('../model/user.js');
 
 mongoose.Promise = Promise;
 
-require('../server.js');
+const serverToggle = require('./lib/server-toggler.js');
+const server = require('../server.js');
 
 const url = `http://localhost:${process.env.PORT}`;
 
@@ -25,6 +26,14 @@ const otherUser = {
 };
 
 describe('User Routes', function() {
+  before( done => {
+    serverToggle.serverOn(server, done);
+  });
+
+  after( done => {
+    serverToggle.serverOff(server, done);
+  });
+
   afterEach( done => {
     User.remove({})
     .then( () => done())
@@ -48,10 +57,8 @@ describe('User Routes', function() {
     describe('without a request body', () => {
       it('should return a 400 error', done => {
         request.post(`${url}/api/signup`)
-        .end((err, res) => {
-          console.log('res', res.text);
+        .end( err => {
           expect(err.status).to.equal(400);
-          expect(res.status).to.equal(err.status);
           done();
         });
       });
@@ -65,14 +72,14 @@ describe('User Routes', function() {
           password: 'checkit',
           email: 'notanemail'
         })
-        .end((err, res) => {
+        .end( err => {
           expect(err.status).to.equal(400);
-          expect(res.status).to.equal(err.status);
           done();
         });
       });
     });
   });
+
 
   describe('GET: /api/signin', function() {
     beforeEach( done => {
@@ -102,9 +109,8 @@ describe('User Routes', function() {
     describe('without a request body', () => {
       it('should return a 401 error', done => {
         request.get(`${url}/api/signin`)
-        .end((err, res) => {
+        .end( err => {
           expect(err.status).to.equal(401);
-          expect(res.text).to.equal('UnauthorizedError');
           done();
         });
       });
@@ -114,10 +120,8 @@ describe('User Routes', function() {
       it('should return a 401 error', done => {
         request.get(`${url}/api/signin`)
         .auth('', 'password')
-        .end((err, res) => {
+        .end( err => {
           expect(err.status).to.equal(401);
-          expect(res.text).to.equal('UnauthorizedError');
-          expect(err.message).to.equal('Unauthorized');
           done();
         });
       });
@@ -127,10 +131,8 @@ describe('User Routes', function() {
       it('should return a 401 error', done => {
         request.get(`${url}/api/signin`)
         .auth('tester name', '')
-        .end((err, res) => {
+        .end( err => {
           expect(err.status).to.equal(401);
-          expect(res.text).to.equal('UnauthorizedError');
-          expect(err.message).to.equal('Unauthorized');
           done();
         });
       });
@@ -140,10 +142,8 @@ describe('User Routes', function() {
       it('should return a 404 error', done => {
         request.get(`${url}/api/signin`)
         .auth('not the name', 'password')
-        .end((err, res) => {
+        .end( err => {
           expect(err.status).to.equal(404);
-          expect(res.text).to.equal('NotFoundError');
-          expect(err.message).to.equal('Not Found');
           done();
         });
       });
@@ -153,9 +153,7 @@ describe('User Routes', function() {
       it('should return a 401 error', done => {
         request.get(`${url}/api/signin`)
         .auth('tester name', 'wrong')
-        .end((err, res) => {
-          console.log('err', err.message);
-          console.log('res', res.text);
+        .end( err => {
           expect(err.status).to.equal(401);
           done();
         });
@@ -216,10 +214,8 @@ describe('User Routes', function() {
         .set({
           Authorization: `Bearer ${this.tempToken}`
         })
-        .end((err, res) => {
+        .end( err => {
           expect(err.status).to.equal(400);
-          expect(err.message).to.equal('Bad Request');
-          expect(res.text).to.equal('BadRequestError');
           done();
         });
       });
@@ -229,10 +225,8 @@ describe('User Routes', function() {
       it('should return a 401 error', done => {
         request.put(`${url}/api/user`)
         .send({ email: 'new@email.com'})
-        .end((err, res) => {
+        .end( err => {
           expect(err.status).to.equal(401);
-          expect(err.message).to.equal('Unauthorized');
-          expect(res.text).to.equal('UnauthorizedError');
           done();
         });
       });
@@ -245,9 +239,8 @@ describe('User Routes', function() {
           Authorization: `Bearer ${this.tempToken}`
         })
         .send({ favColor: 'blue' })
-        .end((err, res) => {
+        .end( err => {
           expect(err.status).to.equal(400);
-          console.log('res', res.text);
           done();
         });
       });
@@ -287,9 +280,8 @@ describe('User Routes', function() {
     describe('without a token', () => {
       it('should return a 401 error', done => {
         request.delete(`${url}/api/user`)
-        .end((err, res) => {
+        .end( err => {
           expect(err.status).to.equal(401);
-          expect(res.text).to.equal('UnauthorizedError');
           done();
         });
       });

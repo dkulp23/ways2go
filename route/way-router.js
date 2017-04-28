@@ -1,13 +1,13 @@
 'use strict';
 
 const debug = require('debug')('ways2go:way');
-const createError = require('http-errors'); //eslint-disable-line
+const createError = require('http-errors');
 const jsonParser = require('body-parser').json();
-const parseLocation = require('parse-address').parseLocation;
 const Promise = require('bluebird');
 const mongoose = require('mongoose');
 mongoose.Promise = Promise;
 
+const parseLocationGoogle = require('../lib/parse-location-google.js');
 const bearerAuth = require('../lib/bearer-auth-middleware.js');
 const Way = require('../model/way.js');
 const Profile = require('../model/profile.js');
@@ -21,15 +21,17 @@ wayRouter.post('/api/way', bearerAuth, jsonParser, function(req, res, next) {
   if(!req.body.startLocation) return next(createError(400, 'start location required'));
   if(!req.body.endLocation) return next(createError(400, 'end location required'));
 
-  let promStart = new Location(parseLocation(req.body.startLocation)).save()
-  .then( location => {req.body.startLocationID = location._id;} )
+  let promStart = parseLocationGoogle(req.body.startLocation)
+  .then( geolocation => new Location(geolocation).save())
+  .then( location => {req.body.startLocation = location._id;} )
   .catch(next);
 
-  let promEnd = new Location(parseLocation(req.body.endLocation)).save()
-  .then( location => {req.body.endLocationID = location._id;} )
+  let promEnd = parseLocationGoogle(req.body.endLocation)
+  .then( geolocation => new Location(geolocation).save())
+  .then( location => {req.body.endLocation = location._id;} )
   .catch(next);
 
-  let promProfile = Profile.findOne({ userID: req.user._id })
+  let promProfile = Profile.findOne({ profileID: req.user._id })
   .then ( profile => {
     req.body.profileID = profile._id;
   })
@@ -41,6 +43,12 @@ wayRouter.post('/api/way', bearerAuth, jsonParser, function(req, res, next) {
     .then( way => {
       way.wayerz.push(way.profileID);
       return way.save();
+    })
+    .then( way => {
+      return Way.findById(way._id)
+      .populate('startLocation')
+      .populate('endLocation')
+      .populate('wayerz');
     })
     .then( way => res.json(way))
     .catch(next);
@@ -59,7 +67,7 @@ wayRouter.post('/api/way/:wayID/wayerz/:wayerID', bearerAuth, function(req, res,
   })
   .then( way => {
     tempWay = way;
-    return Profile.findOne({ userID: req.user._id.toString() });
+    return Profile.findOne({ profileID: req.user._id.toString() });
   })
   .then( profile => {
     if (profile._id.toString() !== tempWay.profileID.toString()) return next(createError(401, 'not owner of way'));
@@ -83,7 +91,7 @@ wayRouter.delete('/api/way/:wayID/wayerz/:wayerID', bearerAuth, function(req, re
   })
   .then( way => {
     tempWay = way;
-    return Profile.findOne({ userID: req.user._id.toString() });
+    return Profile.findOne({ profileID: req.user._id.toString() });
   })
   .then( profile => {
     if (profile._id.toString() !== tempWay.profileID.toString()) return next(createError(401, 'not owner of way'));
@@ -99,8 +107,8 @@ wayRouter.get('/api/way/:id', function(req, res, next) {
   debug('GET: /api/way/:id');
 
   Way.findById(req.params.id)
-  .populate('startLocationID')
-  .populate('endLocationID')
+  .populate('startLocation')
+  .populate('endLocation')
   .populate('wayerz')
   .then( way => {
     res.json(way);
@@ -112,6 +120,9 @@ wayRouter.get('/api/way', function(req, res, next) {
   debug('GET: /api/way');
 
   Way.find({})
+  .populate('startLocation')
+  .populate('endLocation')
+  .populate('wayerz')
   .then( ways => res.json(ways))
   .catch(next);
 });
@@ -125,8 +136,43 @@ wayRouter.put('/api/way/:id', bearerAuth, jsonParser, function(req, res, next) {
     if (!Way.schema.paths[prop]) return next(createError(400, 'invalid request body'));
   }
 
-  Way.findByIdAndUpdate(req.params.id, req.body, { new: true })
-  .then( way => res.json(way))
+  let promStart = new Promise((resolve, reject) => {
+    if (req.body.startLocation) {
+      parseLocationGoogle(req.body.startLocation)
+      .then( geolocation => new Location(geolocation).save())
+      .then( location => {
+        req.body.startLocation = location._id;
+        resolve();
+      })
+      .catch(reject);
+    } else resolve();
+  });
+
+  let promEnd = new Promise((resolve, reject) => {
+    if (req.body.endLocation) {
+      parseLocationGoogle(req.body.endLocation)
+      .then( geolocation => new Location(geolocation).save())
+      .then( location => {
+        req.body.endLocation = location._id;
+        resolve();
+      })
+      .catch(reject);
+    } else resolve();
+  });
+
+  Promise.all([ promStart, promEnd ])
+  .then( () => {
+    return Way.findByIdAndUpdate(req.params.id, req.body, { new: true });
+  })
+  .then( way => {
+    return Way.findById(way._id)
+    .populate('startLocation')
+    .populate('endLocation')
+    .populate('wayerz');
+  })
+  .then( way => {
+    res.json(way);
+  })
   .catch(next);
 });
 
